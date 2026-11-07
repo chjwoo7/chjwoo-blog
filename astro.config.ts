@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config"
 import sitemap from "@astrojs/sitemap"
+import react from "@astrojs/react"
 import tailwindcss from "@tailwindcss/vite"
 import { satteri } from "@astrojs/markdown-satteri"
 import {
@@ -20,6 +21,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   integrations: [
+    react(),
     sitemap({
       filter: (page) =>
         !/\/blog\/[^/]+\/[^/]+\/?$/.test(page) &&
