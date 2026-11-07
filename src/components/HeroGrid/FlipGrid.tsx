@@ -1,38 +1,46 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import FlipCard from "./FlipCard";
 
 export default function FlipGrid() {
+    const [mounted, setMounted] = useState(false);
     const [globalFlip, setGlobalFlip] = useState(false);
     const [randomDelays, setRandomDelays] = useState<number[]>([]);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [isFinished, setIsFinished] = useState(false); // New state to hide grid after transition
-    const [useFlipDelay, setUseFlipDelay] = useState(false); // Only use random delay during global transitions
-    const [resetTrigger, setResetTrigger] = useState(0); // Trigger to force reset hover states
-    const [isMobile, setIsMobile] = useState(false);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [isFinished, setIsFinished] = useState(false);
+    const [useFlipDelay, setUseFlipDelay] = useState(false);
+    const [resetTrigger, setResetTrigger] = useState(0);
+    const [isMobile, setIsMobile] = useState(() =>
+        typeof window !== "undefined" ? window.innerWidth < 768 : false
+    );
+    const [dimensions, setDimensions] = useState(() => ({
+        width: typeof window !== "undefined" ? window.innerWidth : 1280,
+        height: typeof window !== "undefined" ? window.innerHeight : 800,
+    }));
 
     // Responsive Check & Dimensions
     useEffect(() => {
+        setMounted(true);
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
             setDimensions({
                 width: window.innerWidth,
-                height: window.innerHeight
+                height: window.innerHeight,
             });
         };
 
-        handleResize(); // Initial check
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     // Remove Curtain
     useEffect(() => {
-        const curtain = document.getElementById('initial-curtain');
+        const curtain = document.getElementById("initial-curtain");
         if (curtain) {
             setTimeout(() => {
-                curtain.style.transition = 'opacity 0.5s ease';
-                curtain.style.opacity = '0';
+                curtain.style.transition = "opacity 0.5s ease";
+                curtain.style.opacity = "0";
                 setTimeout(() => curtain.remove(), 500);
             }, 100);
         }
@@ -40,9 +48,9 @@ export default function FlipGrid() {
 
     // Lock Scroll
     useEffect(() => {
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
         return () => {
-            document.body.style.overflow = '';
+            document.body.style.overflow = "";
         };
     }, []);
 
@@ -50,13 +58,9 @@ export default function FlipGrid() {
     const cols = isMobile ? 4 : 6;
     const rows = isMobile ? 9 : 6;
 
-    // --- MANUAL SIZING (CONTAINED) ---
-
     const minD = Math.min(dimensions.width, dimensions.height || 1);
     const bgWidth = minD * 0.65;
     const bgHeight = minD * 0.65;
-
-
 
     // Centering offsets
     const xOffset = (bgWidth - dimensions.width) / 2;
@@ -66,106 +70,144 @@ export default function FlipGrid() {
     const cellWidth = dimensions.width / cols;
     const cellHeight = dimensions.height / rows;
 
-    // Create exact 6x6 grid = 36 cards
+    // 36 Cards
     const cards = Array.from({ length: 36 }, (_, i) => ({ id: i }));
 
-    // Generate random delays once on mount
-    // Generate random delays once on mount
     useEffect(() => {
-        const delays = cards.map(() => Math.random() * 300); // Random 0-300ms
+        const delays = cards.map(() => Math.random() * 300);
         setRandomDelays(delays);
     }, []);
 
     const toggleGlobalFlip = () => {
         if (isTransitioning) return;
         setUseFlipDelay(true);
-        setResetTrigger(prev => prev + 1); // Force reset all hover states
+        setResetTrigger((prev) => prev + 1);
         setGlobalFlip(!globalFlip);
-        // Reset delay usage after animation completes so hovers are instant
         setTimeout(() => setUseFlipDelay(false), 800);
     };
 
-    const handleEnterSite = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleEnterSite = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         // Unlock Scroll
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
 
-        setUseFlipDelay(true);    // Activate delay for transition
-        setResetTrigger(prev => prev + 1); // Force reset all hover states
-        setIsTransitioning(true); // 1. Set mode transisi (Front jadi transparan)
-        setGlobalFlip(false);     // 2. Flip balik ke Front
+        setUseFlipDelay(true);
+        setResetTrigger((prev) => prev + 1);
+        setIsTransitioning(true);
+        setGlobalFlip(false);
 
-        // 3. Remove Grid from DOM after animation completes so user can interact with site
         setTimeout(() => {
             setIsFinished(true);
         }, 1200);
     };
 
-    // If animation finished, don't render anything (allow interaction with underlying site)
-    if (isFinished) return null;
+    if (!mounted || isFinished) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-transparent pointer-events-none">
-            {/* Background blocker: Prevents leaks through gaps initially. Hidden instantly on click. */}
-            <div className={`absolute inset-0 bg-[#0D1326] ${isTransitioning ? 'hidden' : 'block'}`} />
+    return createPortal(
+        <div
+            style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 99999,
+                overflow: "hidden",
+                backgroundColor: "transparent",
+                pointerEvents: isTransitioning ? "none" : "auto",
+            }}
+        >
+            {/* Background blocker */}
+            <div
+                style={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundColor: "#0D1326",
+                    display: isTransitioning ? "none" : "block",
+                    zIndex: 1,
+                }}
+            />
 
-            {/* STRICT 6x6 Grid: 6 Columns x 6 Rows = 36 Cards */}
-            <div className={`grid h-full w-full gap-1 p-1 relative z-10 ${isTransitioning ? 'pointer-events-none' : 'pointer-events-auto'}`} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+            {/* Grid */}
+            <div
+                style={{
+                    display: "grid",
+                    height: "100%",
+                    width: "100%",
+                    gap: "4px",
+                    padding: "4px",
+                    position: "relative",
+                    zIndex: 10,
+                    gridTemplateColumns: `repeat(${cols}, 1fr)`,
+                    gridTemplateRows: `repeat(${rows}, 1fr)`,
+                    pointerEvents: isTransitioning ? "none" : "auto",
+                }}
+            >
                 {cards.map((card, index) => {
-                    // Calculate Grid Position (Dynamic)
                     const col = index % cols;
                     const row = Math.floor(index / cols);
-                    console.log(col, row);
 
-                    // Specific Position for this card (Front - Centered)
                     const bgPosX = -(col * cellWidth) - xOffset;
                     const bgPosY = -(row * cellHeight) - yOffset;
 
-                    // BACK CARD: Center-Top Aligned
-                    // X: Centered (Use xOffset)
-                    // Y: Top (No yOffset)
                     const bgPosXBack = -(col * cellWidth) - xOffset;
                     const bgPosYBack = -(row * cellHeight);
 
                     return (
-                        <div key={index} className="w-full h-full relative overflow-hidden rounded-[4px] sm:rounded-[10px]">
+                        <div
+                            key={index}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                position: "relative",
+                                overflow: "hidden",
+                                borderRadius: isMobile ? "4px" : "10px",
+                            }}
+                        >
                             <FlipCard
                                 id={card.id}
-                                index={index}
                                 globalFlip={globalFlip}
                                 randomDelay={randomDelays[index] || 0}
-                                revealMode={false} // Unused for this logic
-                                useDelay={useFlipDelay} // Pass the DELAY state here, correct prop name
-                                resetTrigger={resetTrigger} // Pass reset trigger
+                                revealMode={false}
+                                useDelay={useFlipDelay}
+                                resetTrigger={resetTrigger}
                                 onGlobalClick={toggleGlobalFlip}
                                 front={
                                     isTransitioning ? (
-                                        // Transition Mode: Transparent Front (Reveal Iframe)
-                                        <div className="h-full w-full rounded-[4px] sm:rounded-[10px] bg-transparent" />
-                                    ) : (
-                                        // Normal Mode: Image Mask
                                         <div
-                                            className="h-full w-full transition-all duration-300 relative group rounded-[4px] sm:rounded-[10px]"
                                             style={{
+                                                height: "100%",
+                                                width: "100%",
+                                                borderRadius: isMobile ? "4px" : "10px",
+                                                backgroundColor: "transparent",
+                                            }}
+                                        />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                height: "100%",
+                                                width: "100%",
+                                                borderRadius: isMobile ? "4px" : "10px",
                                                 backgroundImage: "url('/static/hero-mask2.png')",
-                                                backgroundSize: `${bgWidth}px ${bgHeight}px`, // Use calculated PX size
-                                                backgroundPosition: `${bgPosX}px ${bgPosY}px`, // Use calculated PX position
-                                                backgroundRepeat: 'no-repeat',
-                                                backgroundColor: '#171C33'
+                                                backgroundSize: `${bgWidth}px ${bgHeight}px`,
+                                                backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                                                backgroundRepeat: "no-repeat",
+                                                backgroundColor: "#171C33",
+                                                transition: "all 0.3s ease",
                                             }}
                                         />
                                     )
                                 }
                                 back={
                                     <div
-                                        className="h-full w-full transition-all duration-300 relative group rounded-[4px] sm:rounded-[10px]"
                                         style={{
+                                            height: "100%",
+                                            width: "100%",
+                                            borderRadius: isMobile ? "4px" : "10px",
                                             backgroundImage: "url('/static/hero-flipped-mask.svg')",
-                                            backgroundSize: `${bgWidth}px ${bgHeight}px`, // Same scale logic
-                                            backgroundPosition: `${bgPosXBack}px ${bgPosYBack}px`, // Top-Left Aligned
-                                            backgroundRepeat: 'no-repeat',
-                                            backgroundColor: '#6f64eb'
+                                            backgroundSize: `${bgWidth}px ${bgHeight}px`,
+                                            backgroundPosition: `${bgPosXBack}px ${bgPosYBack}px`,
+                                            backgroundRepeat: "no-repeat",
+                                            backgroundColor: "#6f64eb",
+                                            transition: "all 0.3s ease",
                                         }}
                                     />
                                 }
@@ -175,37 +217,123 @@ export default function FlipGrid() {
                 })}
             </div>
 
-            {/* Centered Info when Flipped */}
-            <div className={`absolute inset-0 pointer-events-none flex items-center justify-center z-20 ${isTransitioning ? 'duration-0' : 'transition-opacity duration-300'} ${globalFlip && !isTransitioning ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <div className={`bg-[#171C33] backdrop-blur-xl p-6 sm:p-8 rounded-2xl text-center shadow-2xl transition-all duration-300 w-[90%] max-w-sm sm:max-w-md translate-y-12 sm:translate-y-32 ${globalFlip && !isTransitioning ? 'pointer-events-auto scale-100' : 'pointer-events-none scale-95'}`}>
-                    <div className="shrink-0 mb-4">
+            {/* Centered Profile Card when Flipped */}
+            <div
+                style={{
+                    position: "absolute",
+                    inset: 0,
+                    zIndex: 25,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    pointerEvents: globalFlip && !isTransitioning ? "auto" : "none",
+                    opacity: globalFlip && !isTransitioning ? 1 : 0,
+                    transition: isTransitioning ? "none" : "opacity 0.3s ease",
+                }}
+            >
+                <div
+                    style={{
+                        backgroundColor: "#171C33",
+                        backdropFilter: "blur(20px)",
+                        WebkitBackdropFilter: "blur(20px)",
+                        border: "1.5px solid rgba(111, 100, 235, 0.4)",
+                        borderRadius: "1.25rem",
+                        padding: isMobile ? "1.5rem" : "2.25rem 2.5rem",
+                        textAlign: "center",
+                        boxShadow: "0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(111, 100, 235, 0.3)",
+                        width: "90%",
+                        maxWidth: "420px",
+                        transform: globalFlip && !isTransitioning ? "scale(1)" : "scale(0.95)",
+                        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                        color: "#ffffff",
+                        fontFamily: "var(--font-sans, system-ui, -apple-system, sans-serif)",
+                    }}
+                >
+                    <div style={{ marginBottom: "1rem" }}>
                         <img
                             src="https://media1.tenor.com/m/juxuFY7b89UAAAAd/jiwoo-hearts2hearts.gif"
-                            alt="Profile"
-                            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-[#6f64eb] mx-auto shadow-[0_0_15px_rgba(111,100,235,0.5)] object-cover"
+                            alt="chjwoo profile"
+                            style={{
+                                width: isMobile ? "80px" : "96px",
+                                height: isMobile ? "80px" : "96px",
+                                borderRadius: "9999px",
+                                border: "2.5px solid #6f64eb",
+                                margin: "0 auto",
+                                boxShadow: "0 0 20px rgba(111, 100, 235, 0.6)",
+                                objectFit: "cover",
+                                display: "block",
+                            }}
                         />
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-wide font-outfit">
+                    <h1
+                        style={{
+                            fontSize: isMobile ? "1.75rem" : "2.25rem",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            marginBottom: "0.4rem",
+                            letterSpacing: "0.02em",
+                            lineHeight: 1.2,
+                        }}
+                    >
                         chjwoo
                     </h1>
-                    <p className="text-gray-400 text-sm sm:text-base font-medium mb-0 font-space-grotesk">
+
+                    <p
+                        style={{
+                            color: "#9ca3af",
+                            fontSize: isMobile ? "0.875rem" : "1rem",
+                            fontWeight: 500,
+                            marginBottom: "0.25rem",
+                            lineHeight: 1.4,
+                        }}
+                    >
                         Offensive Security & CTF Player
                     </p>
-                    <p className="text-gray-400 text-sm sm:text-base font-medium mb-6 font-space-grotesk">
+
+                    <p
+                        style={{
+                            color: "#c4b5fd",
+                            fontSize: isMobile ? "0.875rem" : "1rem",
+                            fontWeight: 500,
+                            marginBottom: "1.5rem",
+                            lineHeight: 1.4,
+                        }}
+                    >
                         Founder of Nusahack
                     </p>
 
-                    <a
-                        href="#"
+                    <button
+                        type="button"
                         onClick={handleEnterSite}
-                        className="inline-block px-6 py-3 sm:px-8 sm:py-3 rounded-full bg-[#6f64eb] text-white font-bold text-sm sm:text-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(111,100,235,0.6)] active:scale-95 cursor-pointer"
-                        data-astro-prefetch="tap"
+                        style={{
+                            display: "inline-block",
+                            padding: isMobile ? "0.7rem 1.75rem" : "0.75rem 2.25rem",
+                            borderRadius: "9999px",
+                            backgroundColor: "#6f64eb",
+                            color: "#ffffff",
+                            fontWeight: 700,
+                            fontSize: isMobile ? "0.95rem" : "1.05rem",
+                            border: "none",
+                            cursor: "pointer",
+                            boxShadow: "0 0 25px rgba(111, 100, 235, 0.6)",
+                            transition: "all 0.2s ease",
+                            outline: "none",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.05)";
+                            e.currentTarget.style.boxShadow = "0 0 35px rgba(111, 100, 235, 0.9)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)";
+                            e.currentTarget.style.boxShadow = "0 0 25px rgba(111, 100, 235, 0.6)";
+                        }}
                     >
                         Enter Site
-                    </a>
+                    </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

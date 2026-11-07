@@ -7,11 +7,10 @@ interface FlipCardProps {
     back: React.ReactNode;
     globalFlip: boolean;
     onGlobalClick: () => void;
-    index?: number;
     randomDelay?: number;
     revealMode?: boolean;
     useDelay?: boolean;
-    resetTrigger?: number; // New prop to force reset hover
+    resetTrigger?: number;
 }
 
 export default function FlipCard({
@@ -36,13 +35,18 @@ export default function FlipCard({
 
     return (
         <div
-            className="relative h-full w-full cursor-pointer perspective-1000"
-            onMouseEnter={() => !useDelay && setIsHovered(true)} // Disable hover during global transition
+            style={{
+                position: "relative",
+                height: "100%",
+                width: "100%",
+                cursor: "pointer",
+                perspective: "1000px",
+            }}
+            onMouseEnter={() => !useDelay && setIsHovered(true)}
             onMouseLeave={() => !useDelay && setIsHovered(false)}
             onClick={onGlobalClick}
         >
             <motion.div
-                className="relative h-full w-full preserve-3d"
                 initial={false}
                 animate={{ rotateX: isFlipped ? 180 : 0 }}
                 transition={{
@@ -50,31 +54,51 @@ export default function FlipCard({
                     stiffness: 260,
                     damping: 20,
                     mass: 1,
-                    delay: useDelay ? randomDelay / 1000 : 0, // Delay ONLY if useDelay is true
+                    delay: useDelay ? randomDelay / 1000 : 0,
                 }}
-                style={{ transformStyle: "preserve-3d" }}
+                style={{
+                    position: "relative",
+                    height: "100%",
+                    width: "100%",
+                    transformStyle: "preserve-3d",
+                }}
             >
                 {/* Front Face */}
-                <div className="absolute inset-0 h-full w-full backface-hidden">
-                    <div className="h-full w-full flex items-center justify-center rounded-[10px] transition-colors duration-300">
-                        {front}
-                    </div>
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        height: "100%",
+                        width: "100%",
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "10px",
+                    }}
+                >
+                    {front}
                 </div>
 
                 {/* Back Face */}
                 <div
-                    className="absolute inset-0 h-full w-full backface-hidden"
-                    style={{ transform: "rotateX(180deg)" }}
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        height: "100%",
+                        width: "100%",
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                        transform: "rotateX(180deg)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "10px",
+                        backgroundColor: revealMode ? "transparent" : "#6f64eb",
+                    }}
                 >
-                    {revealMode ? (
-                        // Reveal Mode: Transparent to show Iframe
-                        <div className="h-full w-full rounded-[10px]" />
-                    ) : (
-                        // Normal Mode: Purple Back
-                        <div className="h-full w-full flex items-center justify-center bg-[#6f64eb] text-black rounded-[10px]">
-                            {back}
-                        </div>
-                    )}
+                    {back}
                 </div>
             </motion.div>
         </div>
