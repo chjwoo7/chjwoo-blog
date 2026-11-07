@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config"
 import sitemap from "@astrojs/sitemap"
+import tailwindcss from "@tailwindcss/vite"
 import { satteri } from "@astrojs/markdown-satteri"
 import {
   blockExpressiveCode,
@@ -15,6 +16,9 @@ export default defineConfig({
   site: "https://chjwoo.vercel.app",
   compressHTML: true,
   prefetch: { prefetchAll: true },
+  vite: {
+    plugins: [tailwindcss()],
+  },
   integrations: [
     sitemap({
       filter: (page) =>
