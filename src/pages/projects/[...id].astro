@@ -1,0 +1,178 @@
+---
+import ExternalIcon from "@/assets/icons/external.svg"
+import MetaPage from "@/components/MetaPage.astro"
+import Layout from "@/layouts/Layout.astro"
+import { formatDate } from "@/lib/utils"
+import { Image } from "astro:assets"
+import { getCollection, render } from "astro:content"
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects")
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }))
+}
+
+const { project } = Astro.props
+const { Content } = await render(project)
+const { name, description, link, tags, image, startDate, endDate } = project.data
+---
+
+<Layout
+  crumbs={[
+    { label: "Projects", href: "/projects" },
+    { label: name, href: `/projects/${project.id}` },
+  ]}
+>
+  <MetaPage slot="head" title={name} description={description} />
+
+  <article class="project-detail">
+    <header class="project-header">
+      {image && (
+          <div class="project-banner">
+            <Image src={image} alt={name} width={1000} height={500} />
+          </div>
+        )}
+
+      <h1>{name}</h1>
+
+      <div class="project-meta">
+        {startDate && (
+            <div class="project-dates">
+              <time datetime={startDate.toISOString()}>
+                {formatDate(startDate)}
+              </time>
+              {" → "}
+              {endDate ? (
+                <time datetime={endDate.toISOString()}>
+                  {formatDate(endDate)}
+                </time>
+              ) : (
+                "Present"
+              )}
+            </div>
+          )}
+
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="external-btn"
+        >
+          <span>Visit Project</span>
+          <ExternalIcon aria-hidden="true" />
+        </a>
+      </div>
+
+      <p class="project-desc">{description}</p>
+
+      {tags && tags.length > 0 && (
+          <div class="project-tags">
+            {tags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+    </header>
+
+    <hr />
+
+    <section class="prose-content">
+      <Content />
+    </section>
+  </article>
+</Layout>
+
+<style>
+  .project-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .project-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    h1 {
+      font-size: var(--step-3);
+      line-height: calc(var(--leading-offset) + 1.1em);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+    }
+  }
+
+  .project-banner img {
+    width: 100%;
+    height: auto;
+    max-height: 24rem;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+  }
+
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xs);
+  }
+
+  .project-dates {
+    font-size: var(--step--1);
+    color: var(--muted-foreground);
+  }
+
+  .external-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    background-color: var(--foreground);
+    color: var(--background);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    svg {
+      width: 0.85em;
+      height: 0.85em;
+    }
+  }
+
+  .project-desc {
+    font-size: var(--step-0);
+    color: var(--muted-foreground);
+    line-height: calc(var(--leading-offset) + 1.3em);
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+
+    .tag {
+      font-size: var(--step--1);
+      padding: 0.15rem 0.5rem;
+      background-color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--muted-foreground);
+    }
+  }
+
+  hr {
+    border: none;
+    border-block-start: 1px solid var(--border);
+    margin: 0;
+  }
+</style>

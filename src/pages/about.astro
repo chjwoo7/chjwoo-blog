@@ -1,0 +1,390 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import Layout from "@/layouts/Layout.astro"
+import ExternalIcon from "@/assets/icons/external.svg"
+---
+
+<Layout crumbs={[{ label: "About", href: "/about" }]}>
+  <MetaPage slot="head" title="About" description="About chjwoo - Offensive Security & CTF Player" />
+
+  <article class="about-page">
+    <!-- Hero Section -->
+    <header class="about-hero">
+      <div class="hero-avatar">
+        <img
+          src="https://media1.tenor.com/m/juxuFY7b89UAAAAd/jiwoo-hearts2hearts.gif"
+          alt="chjwoo profile"
+          width="160"
+          height="160"
+          draggable="false"
+        />
+      </div>
+      <div class="hero-details">
+        <h1>Hi 👋, I'm <span>chjwoo.</span></h1>
+        <h2>Offensive Security & CTF Player</h2>
+        <p>
+          Student from Indonesia passionate about offensive security,
+          penetration testing, and CTF competitions.
+        </p>
+        <div class="tag-row">
+          <span class="badge">⚔️ Offensive Security</span>
+          <span class="badge">🐛 Penetration Testing</span>
+          <span class="badge">🚩 CTF Player</span>
+        </div>
+      </div>
+    </header>
+
+    <hr />
+
+    <!-- About Me Section -->
+    <section class="about-section">
+      <h3>About Me</h3>
+      <div class="card prose-block">
+        <p>
+          I'm deeply passionate about offensive security and competitive CTF. My
+          focus areas include web exploitation, reverse engineering, mobile
+          exploitation, and learning malware development.
+        </p>
+        <p>
+          Through active participation in CTF competitions, I continuously sharpen
+          my skills in various domains including binary exploitation and
+          digital forensics. I'm committed to staying at the forefront of offensive
+          security techniques and contributing to the community through writeups and knowledge sharing.
+        </p>
+      </div>
+    </section>
+
+    <!-- CTF Teams & Communities -->
+    <section class="about-section">
+      <h3>CTF Teams & Communities</h3>
+      <div class="cards-grid">
+        <div class="community-card card">
+          <div class="community-header">
+            <img
+              src="/static/logos/ccug-circle-logo.png"
+              alt="CCUG Logo"
+              width="56"
+              height="56"
+            />
+            <div class="community-title">
+              <h4>CCUG</h4>
+              <span class="subtitle">Cyber Community Universitas Gunadarma</span>
+            </div>
+          </div>
+          <p>
+            University-based CTF team focused on competitive cybersecurity
+            challenges and internal competitions. Based at Gunadarma University.
+          </p>
+          <div class="tag-row">
+            <span class="badge">CTF Team</span>
+            <span class="badge">Organization</span>
+          </div>
+        </div>
+
+        <div class="community-card card">
+          <div class="community-header">
+            <img
+              src="/static/logos/nusahack-circle-logo.png"
+              alt="Nusahack Logo"
+              width="56"
+              height="56"
+            />
+            <div class="community-title">
+              <h4>Nusahack</h4>
+              <span class="subtitle">Cybersecurity & CTF Community</span>
+            </div>
+          </div>
+          <p>
+            Indonesian cybersecurity community for learning, technical discussion,
+            and collaborative CTF participation. From beginners to seasoned practitioners.
+          </p>
+          <div class="community-footer">
+            <div class="tag-row">
+              <span class="badge">Community</span>
+              <span class="badge">CTF</span>
+            </div>
+            <a
+              href="https://discord.gg/fPT2CqC9VF"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="discord-btn"
+            >
+              Join Discord
+              <ExternalIcon aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills & Interests -->
+    <section class="about-section">
+      <h3>Skills & Interests</h3>
+      <div class="skills-grid">
+        <div class="card skill-card">
+          <h4>🛡️ Offensive Security</h4>
+          <ul>
+            <li>Web Exploitation</li>
+            <li>Reverse Engineering</li>
+            <li>Active Directory</li>
+            <li>Mobile Exploitation</li>
+            <li>Binary Exploitation</li>
+          </ul>
+        </div>
+
+        <div class="card skill-card">
+          <h4>💻 Development Interests</h4>
+          <ul>
+            <li>Malware Development</li>
+            <li>Mobile Application Security</li>
+            <li>Automation & Tooling</li>
+            <li>Web Development</li>
+          </ul>
+        </div>
+
+        <div class="card skill-card">
+          <h4>🚩 CTF Focus</h4>
+          <ul>
+            <li>Web Exploitation</li>
+            <li>Reverse Engineering</li>
+            <li>Mobile Exploitation</li>
+            <li>Binary Exploitation (pwn)</li>
+            <li>Digital Forensics</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </article>
+</Layout>
+
+<style>
+  .about-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .about-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-m);
+    text-align: center;
+
+    @media (width >= 40rem) {
+      flex-direction: row;
+      align-items: flex-start;
+      text-align: start;
+    }
+  }
+
+  .hero-avatar img {
+    border-radius: 9999px;
+    border: 3px solid var(--border);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+  }
+
+  .hero-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+
+    h1 {
+      font-size: var(--step-2);
+      line-height: calc(var(--leading-offset) + 1em);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+
+      span {
+        color: var(--foreground);
+        font-weight: var(--font-weight-bold);
+      }
+    }
+
+    h2 {
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-normal);
+      color: var(--muted-foreground);
+    }
+
+    p {
+      color: var(--muted-foreground);
+      font-size: var(--step-0);
+      max-width: 38ch;
+    }
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-2xs);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.5rem;
+    font-size: var(--step--1);
+    background-color: var(--muted);
+    color: var(--foreground);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+
+  .about-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    h3 {
+      font-size: var(--step-1);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+    }
+  }
+
+  .card {
+    background-color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-s);
+  }
+
+  .prose-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    color: var(--muted-foreground);
+    line-height: calc(var(--leading-offset) + 1.4em);
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-s);
+
+    @media (width >= 45rem) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .community-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    p {
+      font-size: var(--step--1);
+      color: var(--muted-foreground);
+      line-height: calc(var(--leading-offset) + 1.3em);
+    }
+  }
+
+  .community-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+
+    img {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+  }
+
+  .community-title {
+    h4 {
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: var(--step--1);
+      color: var(--muted-foreground);
+    }
+  }
+
+  .community-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-start: auto;
+    padding-block-start: var(--space-2xs);
+  }
+
+  .discord-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    background-color: #5865f2;
+    color: #ffffff;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    svg {
+      width: 0.85em;
+      height: 0.85em;
+    }
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-s);
+
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .skill-card {
+    h4 {
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+      margin-block-end: var(--space-2xs);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      li {
+        font-size: var(--step--1);
+        color: var(--muted-foreground);
+        position: relative;
+        padding-inline-start: 1rem;
+
+        &::before {
+          content: "›";
+          position: absolute;
+          left: 0;
+          color: var(--muted-foreground);
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  hr {
+    border: none;
+    border-block-start: 1px solid var(--border);
+    margin: 0;
+  }
+</style>

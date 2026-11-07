@@ -14,9 +14,7 @@ const { name, description, link, tags, image, startDate, endDate } =
 <li>
   {image && (
       <a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={`/projects/${project.id}`}
         tabindex="-1"
         aria-hidden="true"
       >
@@ -24,7 +22,7 @@ const { name, description, link, tags, image, startDate, endDate } =
       </a>
     )}
   <entry-info>
-    <a href={link} target="_blank" rel="noopener noreferrer">{name}</a>
+    <a href={`/projects/${project.id}`}>{name}</a>
     <entry-meta>
       {startDate && (
           <project-dates>
@@ -42,8 +40,10 @@ const { name, description, link, tags, image, startDate, endDate } =
           </project-dates>
         )}
       <project-link>
-        <ExternalIcon aria-hidden="true" />
-        {new URL(link).hostname}
+        <a href={link} target="_blank" rel="noopener noreferrer">
+          <ExternalIcon aria-hidden="true" />
+          {new URL(link).hostname}
+        </a>
       </project-link>
     </entry-meta>
     <p>{description}</p>
