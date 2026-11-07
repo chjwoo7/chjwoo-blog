@@ -14,10 +14,9 @@ export const SITE = {
 } as const
 
 export const NAVIGATION = [
-  { href: "/about", label: "About" },
   { href: "/blog", label: "Blog" },
   { href: "/projects", label: "Projects" },
-  { href: "/authors", label: "Authors" },
+  { href: "/about", label: "About" },
 ]
 
 export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
