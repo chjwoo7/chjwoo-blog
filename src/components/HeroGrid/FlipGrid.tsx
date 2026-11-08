@@ -63,6 +63,7 @@ export default function FlipGrid() {
     const cols = isMobile ? 4 : 6;
     const rows = isMobile ? 9 : 6;
 
+    // First state: one artwork sliced across the cells, centred on the board.
     const minD = Math.min(dimensions.width, dimensions.height || 1);
     const bgWidth = minD * 0.65;
     const bgHeight = minD * 0.65;
@@ -71,9 +72,9 @@ export default function FlipGrid() {
     const xOffset = (bgWidth - dimensions.width) / 2;
     const yOffset = (bgHeight - dimensions.height) / 2;
 
-    // Cell Dimensions
-    const cellWidth = dimensions.width / cols;
-    const cellHeight = dimensions.height / rows;
+    // Cell Dimensions (the real cell pitch, so slices line up across the grid)
+    const cellWidth = (dimensions.width - GRID_PAD * 2 - (cols - 1) * GRID_GAP) / cols;
+    const cellHeight = (dimensions.height - GRID_PAD * 2 - (rows - 1) * GRID_GAP) / rows;
 
     // 36 Cards
     const cards = Array.from({ length: 36 }, (_, i) => ({ id: i }));
@@ -192,6 +193,8 @@ export default function FlipGrid() {
                                             }}
                                         />
                                     ) : (
+                                        // Same artwork, same position, in every state — the hovered
+                                        // card just reveals its own slice of the one centred image.
                                         <div
                                             style={{
                                                 height: "100%",
