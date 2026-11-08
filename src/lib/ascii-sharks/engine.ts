@@ -48,6 +48,11 @@ export class OceanEngine {
     this.schedule();
   }
 
+  /** LOCAL PATCH: expose the renderer's cell-grid toggle. */
+  setGridVisible(visible: boolean) {
+    this.renderer.setGridVisible(visible);
+  }
+
   destroy() {
     this.disposed = true;
     cancelAnimationFrame(this.raf);

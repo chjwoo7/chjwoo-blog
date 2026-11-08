@@ -277,6 +277,8 @@ export class AsciiRenderer {
   private cols = 0;
   private rows = 0;
   private fontFamily = "ui-monospace, Menlo, monospace";
+  /** LOCAL PATCH: upstream always strokes a faint cell grid; we can turn it off. */
+  private showGrid = true;
 
   private dotKind = new Uint8Array(0); // 0 none, 1 blue, 2 green, 3 red, 4 pale
   private dotPhase = new Float32Array(0);
@@ -344,6 +346,13 @@ export class AsciiRenderer {
     if (family) this.fontFamily = family;
   }
 
+  /** LOCAL PATCH: toggle the faint cell grid drawn behind the scene. */
+  setGridVisible(visible: boolean) {
+    if (this.showGrid === visible) return;
+    this.showGrid = visible;
+    this.paintBackground();
+  }
+
   resize(width: number, height: number, dpr: number) {
     const prevCols = this.cols;
     const prevRows = this.rows;
@@ -397,7 +406,8 @@ export class AsciiRenderer {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.fillStyle = "#000";
     g.fillRect(0, 0, W, H);
-    paintGrid(g, W, H, cw, ch, dpr);
+    // LOCAL PATCH: upstream called paintGrid() here unconditionally.
+    if (this.showGrid) paintGrid(g, W, H, cw, ch, dpr);
   }
 
   render(world: World, dt: number) {
