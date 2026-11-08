@@ -31,8 +31,38 @@ const ACCENTS = ["#a99fff", "#8f84f2", "#c5bdff", "#7a6ee0", "#b9b0ff", "#6f64eb
 // Sparse glyphs on bright skin, dense glyphs in shadow, so the texture
 // reinforces the shading instead of fighting it.
 const SKIN_RAMP = ":;t%SX8#@";
-// LOCAL PATCH: glyph ramp for the drifting flowers' cell plates.
-const FLOWER_RAMP = ":;t%SX8#@";
+// LOCAL PATCH: hand-authored flower art. A maths-derived petal shape did not read as a
+// flower at this cell size, so the silhouette comes from a fixed pattern instead.
+const FLOWER_BIG = [
+  ".....###.....",
+  "....#####....",
+  "...#######...",
+  ".#..#####..#.",
+  "###.#####.###",
+  "####.###.####",
+  "#####.#.#####",
+  "####@@@@@####",
+  "#####.#.#####",
+  "####.###.####",
+  "###.#####.###",
+  ".#..#####..#.",
+  "...#######...",
+  "....#####....",
+  ".....###.....",
+];
+const FLOWER_SMALL = [
+  "....###....",
+  "...#####...",
+  ".#..###..#.",
+  "###.###.###",
+  "####.#.####",
+  "###@@@@@###",
+  "####.#.####",
+  "###.###.###",
+  ".#..###..#.",
+  "...#####...",
+  "....###....",
+];
 const FIN_GLYPHS = "%;tS:";
 const RIDGE_GLYPHS = "@8%";
 const EDGE_HEAVY = ":;";
@@ -324,6 +354,9 @@ export class AsciiRenderer {
   private frameId = 0;
   /** Fish cells bucketed by brightness, so each bucket is one fillStyle. */
   private fishBuckets: number[][] = FISH_ALPHAS.map(() => []);
+  /** LOCAL PATCH: cached flower sprites, keyed by radius/variant/cell/dpr. */
+  private flowerCache = new Map<string, { canvas: HTMLCanvasElement; w: number; h: number }>();
+
   private fishStyles = FISH_ALPHAS.map((a) => `rgba(226,221,255,${a})`);
 
   constructor(private canvas: HTMLCanvasElement) {
@@ -878,57 +911,76 @@ export class AsciiRenderer {
   }
 
   /**
-   * LOCAL PATCH: drifting flowers, drawn with the same per-cell technique as fish —
-   * snap to the glyph grid, one plate fillRect + one ramp glyph per cell.
-   * Bulkier than a fish glyph: a five-petal disc of cells, radius given in cells.
+   * LOCAL PATCH: rasterise one flower into a cached sprite.
+   *
+   * Drawn exactly like the fish: one glyph per grid cell, light ink straight on the
+   * water. The silhouette comes from a fixed ASCII pattern (FLOWER_BIG / FLOWER_SMALL)
+   * so it is unmistakably a flower at this cell size.
    */
+  private flowerSprite(radius: number, variant: number) {
+    const key = `${radius}|${variant}|${this.cw}|${this.ch}|${this.dpr}`;
+    const cached = this.flowerCache.get(key);
+    if (cached) return cached;
+
+    const art = radius >= 7 ? FLOWER_BIG : FLOWER_SMALL;
+    const w = art[0].length * this.cw;
+    const h = art.length * this.ch;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(w * this.dpr));
+    canvas.height = Math.max(1, Math.round(h * this.dpr));
+    const g = canvas.getContext("2d");
+    if (!g) return null;
+
+    g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    g.font = `600 ${Math.round(this.ch * 0.8)}px ${this.fontFamily}`;
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+
+    // variant shifts the glyph ramp so neighbouring flowers are not identical
+    const ramp = variant % 2 === 0 ? ".:-=+*#%@" : ".,;:+=*#@";
+
+    for (let row = 0; row < art.length; row++) {
+      const line = art[row];
+      for (let col = 0; col < line.length; col++) {
+        const mark = line[col];
+        if (mark === ".") continue;
+
+        const x = col * this.cw + this.cw / 2;
+        const y = row * this.ch + this.ch / 2 + 1;
+
+        if (mark === "@") {
+          g.fillStyle = "rgba(206,198,255,0.98)";
+          g.fillText("@", x, y);
+          continue;
+        }
+
+        const density = mark === "#" ? 8 : 5;
+        g.fillStyle = mark === "#" ? "rgba(244,240,255,0.95)" : "rgba(226,220,255,0.7)";
+        g.fillText(ramp[density], x, y);
+      }
+    }
+
+    const sprite = { canvas, w, h };
+    this.flowerCache.set(key, sprite);
+    return sprite;
+  }
+
+  /** LOCAL PATCH: draw the drifting flowers from their cached sprites. */
   private drawFlowers(world: World) {
-    const { ctx, cw, ch, cols, rows } = this;
+    const { ctx, cols } = this;
     if (!world.flowers.length || cols === 0) return;
 
     for (const f of world.flowers) {
-      const cx0 = f.x / cw;
-      const cy0 = f.y / ch;
-      const r = f.radius;
-
-      const xSpan = Math.ceil(r * 1.5);
-      for (let oy = -r; oy <= r; oy++) {
-        for (let ox = -xSpan; ox <= xSpan; ox++) {
-          // cells are taller than wide, so petals are squashed in x to stay round
-          const nx = ox / (r * 1.5);
-          const ny = oy / r;
-          const dist = Math.hypot(nx, ny);
-          if (dist > 1.02) continue;
-
-          const angle = Math.atan2(ny, nx);
-          const reach = 0.72 + 0.28 * Math.cos(5 * angle + f.variant);
-          if (dist > reach) continue;
-
-          const col = Math.round(cx0) + ox;
-          const row = Math.round(cy0) + oy;
-          if (col < 0 || row < 0 || col >= cols || row >= rows) continue;
-
-          const x = col * cw;
-          const y = row * ch;
-          const t = 1 - dist / Math.max(reach, 0.001);
-          const shade = 0.22 + 0.78 * t;
-
-          // plate: pale lavender, denser toward the middle
-          ctx.fillStyle = `rgba(226,220,255,${(0.1 + 0.26 * shade).toFixed(3)})`;
-          ctx.fillRect(x + 0.5, y + 0.5, cw - 1, ch - 1);
-
-          // glyph: deep violet ink, same ramp idea as the shark hide
-          const glyph = FLOWER_RAMP[Math.min(FLOWER_RAMP.length - 1, Math.round((1 - shade) * 8))];
-          ctx.fillStyle = t > 0.55 ? "rgba(36,26,82,0.95)" : "rgba(24,18,56,0.95)";
-          ctx.fillText(glyph, x + cw / 2, y + ch / 2 + 1);
-        }
-      }
-
-      // pollen centre
-      const px = Math.round(cx0) * cw + cw / 2;
-      const py = Math.round(cy0) * ch + ch / 2 + 1;
-      ctx.fillStyle = "rgba(201,193,255,0.95)";
-      ctx.fillText("@", px, py);
+      const sprite = this.flowerSprite(f.radius, f.variant);
+      if (!sprite) continue;
+      ctx.drawImage(
+        sprite.canvas,
+        Math.round(f.x - sprite.w / 2),
+        Math.round(f.y - sprite.h / 2),
+        sprite.w,
+        sprite.h
+      );
     }
   }
 

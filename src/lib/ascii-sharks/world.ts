@@ -181,7 +181,7 @@ export class World {
         rise: bulky ? 6 : 10,
         sway: bulky ? W * 0.012 : W * 0.008,
         phase: (i * 1.7) % TAU,
-        radius: bulky ? 6 : 4,
+        radius: bulky ? 8 : 6,
         variant: i % 4,
         seed: (i * 0.137) % 1,
       });
