@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import FlipCard from "./FlipCard";
-import { AsciiOcean } from "@/lib/ascii-sharks/AsciiOcean";
+import { OceanBed } from "./OceanBed";
 
-/** Grid geometry, shared by the real card grid and the ocean mask. */
+/** Grid geometry (kept in one place so nothing can drift). */
 const GRID_GAP = 4;
 const GRID_PAD = 4;
 
@@ -78,37 +78,6 @@ export default function FlipGrid() {
     // 36 Cards
     const cards = Array.from({ length: 36 }, (_, i) => ({ id: i }));
 
-    // One full-viewport ocean canvas, but only the card cells are allowed to show it.
-    // An SVG mask with one rounded rect per cell keeps a single simulation running while
-    // the water reads as being *inside* each flipped card, not behind the seams.
-    const oceanMask = useMemo(() => {
-        const W = dimensions.width;
-        const H = dimensions.height;
-        if (!W || !H) return undefined;
-
-        const cellW = (W - GRID_PAD * 2 - (cols - 1) * GRID_GAP) / cols;
-        const cellH = (H - GRID_PAD * 2 - (rows - 1) * GRID_GAP) / rows;
-        if (cellW <= 0 || cellH <= 0) return undefined;
-
-        const rx = isMobile ? 4 : 10;
-        const rects: string[] = [];
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                const x = GRID_PAD + c * (cellW + GRID_GAP);
-                const y = GRID_PAD + r * (cellH + GRID_GAP);
-                rects.push(
-                    `<rect x='${x.toFixed(2)}' y='${y.toFixed(2)}' width='${cellW.toFixed(
-                        2
-                    )}' height='${cellH.toFixed(2)}' rx='${rx}' fill='#fff'/>`
-                );
-            }
-        }
-        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'>${rects.join(
-            ""
-        )}</svg>`;
-        return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
-    }, [dimensions.width, dimensions.height, cols, rows, isMobile]);
-
     useEffect(() => {
         const delays = cards.map(() => Math.random() * 300);
         setRandomDelays(delays);
@@ -165,38 +134,10 @@ export default function FlipGrid() {
                 }}
             />
 
-            {/* ASCII shark ocean — masked INTO the card cells (one rect per cell), so the
-                water lives inside each flipped card instead of showing through the seams.
-                Mounted only while flipped, so no rAF loop runs on a cold page load. */}
-            {globalFlip && oceanMask && (
-                <div
-                    style={{
-                        position: "absolute",
-                        inset: 0,
-                        zIndex: 5,
-                        backgroundColor: "#000000",
-                        opacity: isTransitioning ? 0 : 1,
-                        transition: isTransitioning ? "opacity 0.25s ease" : "none",
-                        pointerEvents: "none",
-                        maskImage: oceanMask,
-                        maskSize: "100% 100%",
-                        maskRepeat: "no-repeat",
-                        maskMode: "alpha",
-                        WebkitMaskImage: oceanMask,
-                        WebkitMaskSize: "100% 100%",
-                        WebkitMaskRepeat: "no-repeat",
-                    }}
-                >
-                    <AsciiOcean
-                        className="ascii-ocean"
-                        sharks={[
-                            { kind: "classic", size: 1 },
-                            { kind: "hammerhead", size: 0.78 },
-                            { kind: "mako", size: 0.62 },
-                        ]}
-                    />
-                </div>
-            )}
+            {/* Shore: no full-bleed water layer exists. This is only the *source* canvas for
+                the simulation — it is never painted on screen. Each flipped card shows its
+                own slice of it, clipped by the card, so the sharks live inside the cards. */}
+            {globalFlip && !isTransitioning && <OceanBed active />}
 
             {/* Grid */}
             <div
@@ -272,14 +213,28 @@ export default function FlipGrid() {
                                             height: "100%",
                                             width: "100%",
                                             borderRadius: isMobile ? "4px" : "10px",
-                                            // The flipped card's background IS the ascii ocean:
-                                            // transparent pane, hairline edge only, so the card
-                                            // grid still reads over the water.
-                                            backgroundColor: "transparent",
-                                            border: "1px solid rgba(111, 100, 235, 0.22)",
+                                            overflow: "hidden",
+                                            position: "relative",
+                                            // The card's own face is the shark art: OceanBed blits
+                                            // this card's slice of the simulation into the canvas
+                                            // below, clipped by the card's rounded box.
+                                            backgroundColor: "#000000",
+                                            border: "1px solid rgba(111, 100, 235, 0.45)",
+                                            boxShadow: "inset 0 0 14px rgba(111, 100, 235, 0.25)",
                                             transition: "all 0.3s ease",
                                         }}
-                                    />
+                                    >
+                                        <canvas
+                                            data-ocean-slice
+                                            aria-hidden="true"
+                                            style={{
+                                                display: "block",
+                                                width: "100%",
+                                                height: "100%",
+                                                pointerEvents: "none",
+                                            }}
+                                        />
+                                    </div>
                                 }
                             />
                         </div>
