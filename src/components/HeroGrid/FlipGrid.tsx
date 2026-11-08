@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import FlipCard from "./FlipCard";
-import { OceanBed } from "./OceanBed";
+import { CARD_PURPLE, OceanBed } from "./OceanBed";
 
 /** Grid geometry (kept in one place so nothing can drift). */
 const GRID_GAP = 4;
@@ -219,7 +219,7 @@ export default function FlipGrid() {
                                             // this card's slice of the simulation into the canvas
                                             // below, clipped by the card's rounded box.
                                             // No border/rim — the card edge is just the clipping shape.
-                                            backgroundColor: "#000000",
+                                            backgroundColor: CARD_PURPLE,
                                             transition: "all 0.3s ease",
                                         }}
                                     >

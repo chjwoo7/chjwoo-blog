@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import { OceanEngine } from "@/lib/ascii-sharks/engine";
 
+/** Same purple as the "Enter Site" button. */
+export const CARD_PURPLE = "#6f64eb";
+
 /**
  * One shark simulation, painted into every `canvas[data-ocean-slice]` on the page.
  *
@@ -26,6 +29,9 @@ export function OceanBed({ active }: { active: boolean }) {
             ]);
             // The scene's faint cell grid would read as hairlines inside every card.
             engine.setGridVisible(false);
+            // Water is the site purple, not black, so the cards and the Enter Site
+            // button share one colour.
+            engine.setBackground(CARD_PURPLE);
         } catch {
             return;
         }

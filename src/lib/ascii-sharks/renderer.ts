@@ -12,18 +12,21 @@ import { SHARK_NODES, type Shark, type SharkKind, type World } from "./world";
 const ALPHA_LEVELS = 6;
 const FISH_ALPHAS = [0.28, 0.42, 0.58, 0.74, 0.9];
 
-// Dot colour classes: blue, green, red, pale; the last entry is the cyan wake.
+// LOCAL PATCH (purple palette): upstream used neon blue/green/red/cyan classes.
+// The scene now sits on the site's #6f64eb purple, so every accent is drawn from a
+// muted violet family instead — deeper for the ink, pale lavender for the lights.
 const DOT_RGB: [number, number, number][] = [
-  [48, 52, 235],
-  [52, 205, 60],
-  [228, 50, 44],
-  [190, 212, 255],
-  [110, 230, 255],
+  [64, 54, 168],
+  [96, 84, 210],
+  [146, 134, 240],
+  [204, 198, 255],
+  [186, 178, 255],
 ];
 const DOT_BASE_ALPHA = [1, 1, 1, 1, 1];
 const WAKE = DOT_RGB.length - 1;
 
-const ACCENTS = ["#e0892c", "#e03a32", "#b44ae0", "#33c8cc", "#3cb54a", "#3150e8", "#d9c14a"];
+// LOCAL PATCH: was a neon rainbow; now violet-only shimmer, no neon.
+const ACCENTS = ["#a99fff", "#8f84f2", "#c5bdff", "#7a6ee0", "#b9b0ff", "#6f64eb", "#d8d2ff"];
 
 // Sparse glyphs on bright skin, dense glyphs in shadow, so the texture
 // reinforces the shading instead of fighting it.
@@ -91,7 +94,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.71, 0.76],
     eye: [0.1, 0.14],
     gills: [0.19, 0.29],
-    tint: [0.92, 0.97, 1.05],
+    tint: [1.0, 0.88, 1.12],
   },
   // Slim neck under a wide, swept-back cephalofoil (drawn in sampleShark),
   // tall first dorsal, long upper tail lobe. Bronze-olive grey.
@@ -110,7 +113,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.7, 0.74],
     eye: null,
     gills: [0.16, 0.26],
-    tint: [0.96, 0.98, 0.9],
+    tint: [1.05, 0.92, 1.08],
   },
   // Blunt, square snout on a heavy body; barred back. Warm grey-brown.
   tiger: {
@@ -129,7 +132,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.71, 0.75],
     eye: [0.08, 0.12],
     gills: [0.19, 0.28],
-    tint: [1.02, 0.95, 0.84],
+    tint: [0.95, 0.85, 1.14],
   },
   // Short rounded head, body done by half-length, then a long ribbon of a
   // tail fin. Broad rounded pectorals, spotted sandy skin.
@@ -149,7 +152,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.49, 0.53],
     eye: [0.06, 0.09],
     gills: [0.13, 0.2],
-    tint: [1.08, 0.97, 0.74],
+    tint: [1.08, 0.9, 1.05],
   },
   // Great hammerhead: a broader, nearly straight-edged cephalofoil with a notch at the centre,
   // a towering sickle first dorsal (drawn long and bright from above), and a cooler slate skin.
@@ -168,7 +171,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.68, 0.74],
     eye: null,
     gills: [0.15, 0.25],
-    tint: [0.86, 0.93, 1.02],
+    tint: [0.92, 0.86, 1.16],
   },
   // Shortfin mako: a long conical snout, a torpedo body that narrows hard to the tail stalk,
   // and a tall crescent tail. Metallic indigo back.
@@ -188,7 +191,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.76, 0.79],
     eye: [0.11, 0.15],
     gills: [0.2, 0.3],
-    tint: [0.78, 0.9, 1.2],
+    tint: [0.98, 0.84, 1.18],
   },
   // Thresher: a compact body over the front half, then the upper tail lobe as a long whip
   // that's as long as the shark itself. Big eyes, long sickle pectorals, bronze-violet skin.
@@ -209,7 +212,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.45, 0.47],
     eye: [0.05, 0.1],
     gills: [0.11, 0.18],
-    tint: [1.0, 0.9, 1.08],
+    tint: [1.03, 0.89, 1.1],
   },
   // Nurse shark: a blunt, broad head, a heavy flattened body with both dorsals set far back,
   // rounded paddle pectorals, and a long low tail with no lower lobe. Tawny brown.
@@ -229,7 +232,7 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     secondDorsal: [0.63, 0.69],
     eye: [0.05, 0.075],
     gills: [0.14, 0.22],
-    tint: [1.1, 0.96, 0.76],
+    tint: [1.06, 0.92, 1.04],
   },
 };
 
@@ -279,6 +282,8 @@ export class AsciiRenderer {
   private fontFamily = "ui-monospace, Menlo, monospace";
   /** LOCAL PATCH: upstream always strokes a faint cell grid; we can turn it off. */
   private showGrid = true;
+  /** LOCAL PATCH: scene backdrop colour (upstream hard-coded #000). */
+  private bgColor = "#000";
 
   private dotKind = new Uint8Array(0); // 0 none, 1 blue, 2 green, 3 red, 4 pale
   private dotPhase = new Float32Array(0);
@@ -317,7 +322,7 @@ export class AsciiRenderer {
   private frameId = 0;
   /** Fish cells bucketed by brightness, so each bucket is one fillStyle. */
   private fishBuckets: number[][] = FISH_ALPHAS.map(() => []);
-  private fishStyles = FISH_ALPHAS.map((a) => `rgba(230,238,255,${a})`);
+  private fishStyles = FISH_ALPHAS.map((a) => `rgba(226,221,255,${a})`);
 
   constructor(private canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d", { alpha: false });
@@ -344,6 +349,13 @@ export class AsciiRenderer {
 
   setFontFamily(family: string) {
     if (family) this.fontFamily = family;
+  }
+
+  /** LOCAL PATCH: paint the backdrop a specific colour. */
+  setBackground(color: string) {
+    if (!color || this.bgColor === color) return;
+    this.bgColor = color;
+    this.paintBackground();
   }
 
   /** LOCAL PATCH: toggle the faint cell grid drawn behind the scene. */
@@ -404,7 +416,7 @@ export class AsciiRenderer {
     if (!g) return;
     const { width: W, height: H, dpr, cw, ch } = this;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = "#000";
+    g.fillStyle = this.bgColor;
     g.fillRect(0, 0, W, H);
     // LOCAL PATCH: upstream called paintGrid() here unconditionally.
     if (this.showGrid) paintGrid(g, W, H, cw, ch, dpr);
@@ -816,11 +828,11 @@ export class AsciiRenderer {
       ctx.fillRect(x + 1, y + 1, cw - 1, ch - 1);
 
       let color: string;
-      if (flag === FLAG_EYE) color = "#9aa0ad";
+      if (flag === FLAG_EYE) color = "#e9e4ff";
       else if (flag === FLAG_MARK) color = `rgb(${Math.round(70 * tr)},${Math.round(70 * tg)},${Math.round(70 * tb)})`;
       else if (roll < 0.09) color = ACCENTS[key % ACCENTS.length];
-      else if (roll < 0.13) color = "#ffffff";
-      else color = shade > 0.55 ? "#0e0f13" : "#1b1d24";
+      else if (roll < 0.13) color = "#efeaff";
+      else color = shade > 0.55 ? "#170f3a" : "#241a52";
       ctx.fillStyle = color;
       ctx.fillText(glyph, x + cw / 2, y + ch / 2 + 1);
     }
@@ -869,7 +881,7 @@ export class AsciiRenderer {
       if (h < 0.08) continue;
       const col = i % cols;
       const row = (i / cols) | 0;
-      ctx.fillStyle = h > 0.5 ? `rgba(255,120,60,${h.toFixed(2)})` : `rgba(220,40,40,${(h * 1.6).toFixed(2)})`;
+      ctx.fillStyle = h > 0.5 ? `rgba(236,231,255,${(h * 0.9).toFixed(2)})` : `rgba(128,116,244,${(h * 1.4).toFixed(2)})`;
       ctx.fillText(h > 0.6 ? "*" : "·", col * cw + cw / 2, row * ch + ch / 2 + 1);
     }
   }

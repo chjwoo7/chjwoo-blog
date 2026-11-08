@@ -53,6 +53,11 @@ export class OceanEngine {
     this.renderer.setGridVisible(visible);
   }
 
+  /** LOCAL PATCH: paint the scene backdrop a specific colour. */
+  setBackground(color: string) {
+    this.renderer.setBackground(color);
+  }
+
   destroy() {
     this.disposed = true;
     cancelAnimationFrame(this.raf);
