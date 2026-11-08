@@ -44,7 +44,10 @@ export default function FlipCard({
             }}
             onMouseEnter={() => !useDelay && setIsHovered(true)}
             onMouseLeave={() => !useDelay && setIsHovered(false)}
-            onClick={onGlobalClick}
+            onClick={(e) => {
+                e.stopPropagation();
+                onGlobalClick();
+            }}
         >
             <motion.div
                 initial={false}

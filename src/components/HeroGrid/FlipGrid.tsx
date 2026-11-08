@@ -88,6 +88,7 @@ export default function FlipGrid() {
 
     const handleEnterSite = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
+        e.stopPropagation();
 
         // Unlock Scroll
         document.body.style.overflow = "";
@@ -117,17 +118,20 @@ export default function FlipGrid() {
         >
             {/* Background blocker */}
             <div
+                onClick={toggleGlobalFlip}
                 style={{
                     position: "absolute",
                     inset: 0,
                     backgroundColor: "#0D1326",
                     display: isTransitioning ? "none" : "block",
                     zIndex: 1,
+                    cursor: "pointer",
                 }}
             />
 
             {/* Grid */}
             <div
+                onClick={toggleGlobalFlip}
                 style={{
                     display: "grid",
                     height: "100%",
@@ -226,12 +230,13 @@ export default function FlipGrid() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    pointerEvents: globalFlip && !isTransitioning ? "auto" : "none",
+                    pointerEvents: "none",
                     opacity: globalFlip && !isTransitioning ? 1 : 0,
                     transition: isTransitioning ? "none" : "opacity 0.3s ease",
                 }}
             >
                 <div
+                    onClick={(e) => e.stopPropagation()}
                     style={{
                         backgroundColor: "#171C33",
                         backdropFilter: "blur(20px)",
@@ -247,6 +252,7 @@ export default function FlipGrid() {
                         transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                         color: "#ffffff",
                         fontFamily: "var(--font-sans, system-ui, -apple-system, sans-serif)",
+                        pointerEvents: globalFlip && !isTransitioning ? "auto" : "none",
                     }}
                 >
                     <div style={{ marginBottom: "1rem" }}>
