@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import FlipCard from "./FlipCard";
+import { AsciiOcean } from "@/lib/ascii-sharks/AsciiOcean";
 
 export default function FlipGrid() {
     const [mounted, setMounted] = useState(false);
@@ -255,21 +256,28 @@ export default function FlipGrid() {
                         pointerEvents: globalFlip && !isTransitioning ? "auto" : "none",
                     }}
                 >
-                    <div style={{ marginBottom: "1rem" }}>
-                        <img
-                            src="https://media1.tenor.com/m/juxuFY7b89UAAAAd/jiwoo-hearts2hearts.gif"
-                            alt="chjwoo profile"
-                            style={{
-                                width: isMobile ? "80px" : "96px",
-                                height: isMobile ? "80px" : "96px",
-                                borderRadius: "9999px",
-                                border: "2.5px solid #6f64eb",
-                                margin: "0 auto",
-                                boxShadow: "0 0 20px rgba(111, 100, 235, 0.6)",
-                                objectFit: "cover",
-                                display: "block",
-                            }}
-                        />
+                    <div
+                        style={{
+                            marginBottom: "1.25rem",
+                            width: "100%",
+                            height: isMobile ? "112px" : "140px",
+                            borderRadius: "0.9rem",
+                            border: "1.5px solid rgba(111, 100, 235, 0.55)",
+                            boxShadow: "0 0 24px rgba(111, 100, 235, 0.35), inset 0 0 60px rgba(0, 0, 0, 0.8)",
+                            backgroundColor: "#000000",
+                            overflow: "hidden",
+                            position: "relative",
+                        }}
+                    >
+                        {globalFlip && !isTransitioning && (
+                            <AsciiOcean
+                                className="ascii-ocean"
+                                sharks={[
+                                    { kind: "classic", size: 1 },
+                                    { kind: "hammerhead", size: 0.72 },
+                                ]}
+                            />
+                        )}
                     </div>
 
                     <h1
