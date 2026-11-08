@@ -1,22 +1,10 @@
 ---
-import FlipGrid from "@/components/HeroGrid/FlipGrid"
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
 ---
 
 <Layout>
   <MetaPage slot="head" />
-
-  <!-- FlipGrid Overlay (Z-Index High) -->
-  <FlipGrid client:only="react" />
-
-  <!-- Initial Load Curtain (Prevents FOUC) -->
-  <div
-    id="initial-curtain"
-    class="pointer-events-none select-none"
-    style="position: fixed; inset: 0; z-index: 99998; background-color: #0D1326;"
-  >
-  </div>
 
   <dictionary-entry>
     <h1>er·u·dite</h1>
