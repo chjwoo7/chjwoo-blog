@@ -19,7 +19,6 @@ export default function FlipCard({
     globalFlip,
     onGlobalClick,
     randomDelay = 0,
-    revealMode = false,
     useDelay = false,
     resetTrigger = 0,
 }: FlipCardProps) {
@@ -98,7 +97,9 @@ export default function FlipCard({
                         alignItems: "center",
                         justifyContent: "center",
                         borderRadius: "10px",
-                        backgroundColor: revealMode ? "transparent" : "#6f64eb",
+                        // Opaque here would hide the ocean behind the board; the `back`
+                        // node owns the pane colour (translucent purple).
+                        backgroundColor: "transparent",
                     }}
                 >
                     {back}

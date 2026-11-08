@@ -130,6 +130,31 @@ export default function FlipGrid() {
                 }}
             />
 
+            {/* ASCII shark ocean — the water behind the flipped (purple) card backs.
+                Mounted only while flipped so no rAF loop runs on a fresh page load. */}
+            {globalFlip && (
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        zIndex: 5,
+                        backgroundColor: "#000000",
+                        opacity: isTransitioning ? 0 : 1,
+                        transition: isTransitioning ? "opacity 0.25s ease" : "none",
+                        pointerEvents: "none",
+                    }}
+                >
+                    <AsciiOcean
+                        className="ascii-ocean"
+                        sharks={[
+                            { kind: "classic", size: 1 },
+                            { kind: "hammerhead", size: 0.78 },
+                            { kind: "mako", size: 0.62 },
+                        ]}
+                    />
+                </div>
+            )}
+
             {/* Grid */}
             <div
                 onClick={toggleGlobalFlip}
@@ -152,9 +177,6 @@ export default function FlipGrid() {
 
                     const bgPosX = -(col * cellWidth) - xOffset;
                     const bgPosY = -(row * cellHeight) - yOffset;
-
-                    const bgPosXBack = -(col * cellWidth) - xOffset;
-                    const bgPosYBack = -(row * cellHeight);
 
                     return (
                         <div
@@ -207,11 +229,11 @@ export default function FlipGrid() {
                                             height: "100%",
                                             width: "100%",
                                             borderRadius: isMobile ? "4px" : "10px",
-                                            backgroundImage: "url('/static/hero-flipped-mask.svg')",
-                                            backgroundSize: `${bgWidth}px ${bgHeight}px`,
-                                            backgroundPosition: `${bgPosXBack}px ${bgPosYBack}px`,
-                                            backgroundRepeat: "no-repeat",
-                                            backgroundColor: "#6f64eb",
+                                            // The flipped card's background IS the ascii ocean:
+                                            // transparent pane, hairline edge only, so the card
+                                            // grid still reads over the water.
+                                            backgroundColor: "transparent",
+                                            border: "1px solid rgba(111, 100, 235, 0.22)",
                                             transition: "all 0.3s ease",
                                         }}
                                     />
@@ -256,28 +278,21 @@ export default function FlipGrid() {
                         pointerEvents: globalFlip && !isTransitioning ? "auto" : "none",
                     }}
                 >
-                    <div
-                        style={{
-                            marginBottom: "1.25rem",
-                            width: "100%",
-                            height: isMobile ? "112px" : "140px",
-                            borderRadius: "0.9rem",
-                            border: "1.5px solid rgba(111, 100, 235, 0.55)",
-                            boxShadow: "0 0 24px rgba(111, 100, 235, 0.35), inset 0 0 60px rgba(0, 0, 0, 0.8)",
-                            backgroundColor: "#000000",
-                            overflow: "hidden",
-                            position: "relative",
-                        }}
-                    >
-                        {globalFlip && !isTransitioning && (
-                            <AsciiOcean
-                                className="ascii-ocean"
-                                sharks={[
-                                    { kind: "classic", size: 1 },
-                                    { kind: "hammerhead", size: 0.72 },
-                                ]}
-                            />
-                        )}
+                    <div style={{ marginBottom: "1rem" }}>
+                        <img
+                            src="https://media1.tenor.com/m/juxuFY7b89UAAAAd/jiwoo-hearts2hearts.gif"
+                            alt="chjwoo profile"
+                            style={{
+                                width: isMobile ? "80px" : "96px",
+                                height: isMobile ? "80px" : "96px",
+                                borderRadius: "9999px",
+                                border: "2.5px solid #6f64eb",
+                                margin: "0 auto",
+                                boxShadow: "0 0 20px rgba(111, 100, 235, 0.6)",
+                                objectFit: "cover",
+                                display: "block",
+                            }}
+                        />
                     </div>
 
                     <h1
