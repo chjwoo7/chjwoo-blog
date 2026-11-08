@@ -79,6 +79,28 @@ export interface WorldEvent {
   y: number;
 }
 
+/**
+ * LOCAL PATCH: a floating flower.
+ * Positions are in world px; `radius` is in grid cells so the shape scales with the
+ * canvas the same way fish glyphs do.
+ */
+export interface Flower {
+  x: number;
+  y: number;
+  /** px per second upward drift */
+  rise: number;
+  /** horizontal sway amplitude, px */
+  sway: number;
+  /** radians per second */
+  phase: number;
+  /** petal radius in cells */
+  radius: number;
+  /** glyph variant, keeps neighbouring flowers from looking identical */
+  variant: number;
+  /** 0..1 sway clock offset */
+  seed: number;
+}
+
 const FISH_SEPARATION_K = 420;
 const FISH_ALIGN_K = 1.4;
 const FISH_COHESION_K = 1;
@@ -91,6 +113,8 @@ export class World {
   time = 0;
   fish: Fish[] = [];
   sharks: Shark[] = [];
+  /** LOCAL PATCH: drifting flowers, drawn with the same per-cell technique as fish. */
+  flowers: Flower[] = [];
   events: WorldEvent[] = [];
   pointer = { x: 0, y: 0, active: false };
 
@@ -107,6 +131,9 @@ export class World {
   private bucketNext = new Int32Array(0);
   private lastSpawn = 0;
   private tmp = { x: 0, y: 0 };
+  /** LOCAL PATCH: cell pitch, needed to place flower petals on whole cells. */
+  cellW = 10;
+  cellH = 14;
 
   /** fishCount overrides the area-based population (the sidebar wants a single small school). */
   constructor(
@@ -118,11 +145,14 @@ export class World {
     const first = this.width === 0;
     this.width = width;
     this.height = height;
+    this.cellW = cellW;
+    this.cellH = cellH;
     // Spacing is set in grid cells so every fish lands in its own cell.
     this.sepX = SPECIES.map((sp) => sp.spacing[0] * cellW);
     this.sepY = SPECIES.map((sp) => sp.spacing[1] * cellH);
     this.perception = Math.max(cellH * 3, cellW * 5.5);
     this.foreignSep = cellW * 3;
+    this.seedFlowers();
 
     if (first || this.fish.length === 0) {
       this.seed();
@@ -131,6 +161,30 @@ export class World {
     for (const f of this.fish) {
       f.x = clamp(f.x, 0, width);
       f.y = clamp(f.y, 0, height);
+    }
+  }
+
+  /** LOCAL PATCH: scatter the drifting flowers across the new box. */
+  private seedFlowers() {
+    const W = this.width;
+    const H = this.height;
+    if (W < 1 || H < 1) return;
+    const count = clamp(Math.round((W * H) / 90000), 5, 10);
+    this.flowers = [];
+    for (let i = 0; i < count; i++) {
+      const gx = (i * 0.6180339887) % 1;
+      const gy = (i * 0.3819660113 + 0.23) % 1;
+      const bulky = i % 3 !== 2;
+      this.flowers.push({
+        x: gx * W,
+        y: gy * H,
+        rise: bulky ? 6 : 10,
+        sway: bulky ? W * 0.012 : W * 0.008,
+        phase: (i * 1.7) % TAU,
+        radius: bulky ? 6 : 4,
+        variant: i % 4,
+        seed: (i * 0.137) % 1,
+      });
     }
   }
 
@@ -230,7 +284,20 @@ export class World {
     this.rebuildHash();
     this.stepFish(dt);
     this.stepSharks(dt);
+    this.stepFlowers(dt);
     this.respawn();
+  }
+
+  /** LOCAL PATCH: flowers drift up and sway, wrapping at the top edge. */
+  private stepFlowers(dt: number) {
+    const span = this.height + this.cellH * 24;
+    for (const f of this.flowers) {
+      f.y -= f.rise * dt;
+      if (f.y < -this.cellH * 12) f.y += span;
+      f.x += Math.sin(this.time * f.phase + f.seed * TAU) * f.sway * dt * 0.6;
+      if (f.x < -this.cellW * 20) f.x += this.width + this.cellW * 40;
+      else if (f.x > this.width + this.cellW * 20) f.x -= this.width + this.cellW * 40;
+    }
   }
 
   private rebuildHash() {

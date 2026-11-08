@@ -31,6 +31,8 @@ const ACCENTS = ["#a99fff", "#8f84f2", "#c5bdff", "#7a6ee0", "#b9b0ff", "#6f64eb
 // Sparse glyphs on bright skin, dense glyphs in shadow, so the texture
 // reinforces the shading instead of fighting it.
 const SKIN_RAMP = ":;t%SX8#@";
+// LOCAL PATCH: glyph ramp for the drifting flowers' cell plates.
+const FLOWER_RAMP = ":;t%SX8#@";
 const FIN_GLYPHS = "%;tS:";
 const RIDGE_GLYPHS = "@8%";
 const EDGE_HEAVY = ":;";
@@ -445,6 +447,7 @@ export class AsciiRenderer {
 
     this.drawHeat();
     this.drawFish();
+    this.drawFlowers(world);
     this.drawSharks(t);
   }
 
@@ -871,6 +874,61 @@ export class AsciiRenderer {
       for (const i of bucket) {
         ctx.fillText("-", (i % cols) * cw + cw / 2, ((i / cols) | 0) * ch + ch / 2 + 1);
       }
+    }
+  }
+
+  /**
+   * LOCAL PATCH: drifting flowers, drawn with the same per-cell technique as fish —
+   * snap to the glyph grid, one plate fillRect + one ramp glyph per cell.
+   * Bulkier than a fish glyph: a five-petal disc of cells, radius given in cells.
+   */
+  private drawFlowers(world: World) {
+    const { ctx, cw, ch, cols, rows } = this;
+    if (!world.flowers.length || cols === 0) return;
+
+    for (const f of world.flowers) {
+      const cx0 = f.x / cw;
+      const cy0 = f.y / ch;
+      const r = f.radius;
+
+      const xSpan = Math.ceil(r * 1.5);
+      for (let oy = -r; oy <= r; oy++) {
+        for (let ox = -xSpan; ox <= xSpan; ox++) {
+          // cells are taller than wide, so petals are squashed in x to stay round
+          const nx = ox / (r * 1.5);
+          const ny = oy / r;
+          const dist = Math.hypot(nx, ny);
+          if (dist > 1.02) continue;
+
+          const angle = Math.atan2(ny, nx);
+          const reach = 0.72 + 0.28 * Math.cos(5 * angle + f.variant);
+          if (dist > reach) continue;
+
+          const col = Math.round(cx0) + ox;
+          const row = Math.round(cy0) + oy;
+          if (col < 0 || row < 0 || col >= cols || row >= rows) continue;
+
+          const x = col * cw;
+          const y = row * ch;
+          const t = 1 - dist / Math.max(reach, 0.001);
+          const shade = 0.22 + 0.78 * t;
+
+          // plate: pale lavender, denser toward the middle
+          ctx.fillStyle = `rgba(226,220,255,${(0.1 + 0.26 * shade).toFixed(3)})`;
+          ctx.fillRect(x + 0.5, y + 0.5, cw - 1, ch - 1);
+
+          // glyph: deep violet ink, same ramp idea as the shark hide
+          const glyph = FLOWER_RAMP[Math.min(FLOWER_RAMP.length - 1, Math.round((1 - shade) * 8))];
+          ctx.fillStyle = t > 0.55 ? "rgba(36,26,82,0.95)" : "rgba(24,18,56,0.95)";
+          ctx.fillText(glyph, x + cw / 2, y + ch / 2 + 1);
+        }
+      }
+
+      // pollen centre
+      const px = Math.round(cx0) * cw + cw / 2;
+      const py = Math.round(cy0) * ch + ch / 2 + 1;
+      ctx.fillStyle = "rgba(201,193,255,0.95)";
+      ctx.fillText("@", px, py);
     }
   }
 

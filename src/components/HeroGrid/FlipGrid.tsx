@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import FlipCard from "./FlipCard";
-import { FlowerBed } from "./FlowerBed";
 import { CARD_PURPLE, OceanBed } from "./OceanBed";
 
 /** Grid geometry (kept in one place so nothing can drift). */
@@ -244,9 +243,6 @@ export default function FlipGrid() {
                     );
                 })}
             </div>
-
-            {/* Small and medium flowers floating over the water while flipped */}
-            {globalFlip && !isTransitioning && <FlowerBed active />}
 
             {/* Centered Profile Card when Flipped */}
             <div
