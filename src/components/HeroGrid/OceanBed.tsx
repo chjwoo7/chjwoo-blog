@@ -26,6 +26,8 @@ export function OceanBed({ active }: { active: boolean }) {
                 { kind: "classic", size: 1 },
                 { kind: "hammerhead", size: 0.78 },
                 { kind: "mako", size: 0.62 },
+                { kind: "tiger", size: 0.88 },
+                { kind: "thresher", size: 0.7 },
             ]);
             // The scene's faint cell grid would read as hairlines inside every card.
             engine.setGridVisible(false);
