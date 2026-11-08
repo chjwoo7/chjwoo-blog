@@ -51,6 +51,20 @@ export const SPECIES: Species[] = [
     schoolSize: [8, 12], spacing: [1.4, 1.1],
     align: 0.35, cohesion: 1.4, jitter: 110, mill: 0, verticalDrag: 0.3,
   },
+  // LOCAL PATCH: two extra fish — a fast, tightly aligned smelt run and a loose,
+  // slow mullet pod, so the water has more variety of movement.
+  {
+    name: "smelt",
+    cruise: 50, maxSpeed: 84, minSpeed: 24, weight: 2,
+    schoolSize: [16, 26], spacing: [1.6, 1],
+    align: 3.6, cohesion: 0.6, jitter: 26, mill: 0, verticalDrag: 1.8,
+  },
+  {
+    name: "mullet",
+    cruise: 24, maxSpeed: 52, minSpeed: 12, weight: 2,
+    schoolSize: [6, 11], spacing: [2.2, 1.2],
+    align: 1.1, cohesion: 1.5, jitter: 55, mill: 20, verticalDrag: 0.8,
+  },
 ];
 
 const TOTAL_WEIGHT = SPECIES.reduce((sum, s) => sum + s.weight, 0);
