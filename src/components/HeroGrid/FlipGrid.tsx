@@ -218,9 +218,8 @@ export default function FlipGrid() {
                                             // The card's own face is the shark art: OceanBed blits
                                             // this card's slice of the simulation into the canvas
                                             // below, clipped by the card's rounded box.
+                                            // No border/rim — the card edge is just the clipping shape.
                                             backgroundColor: "#000000",
-                                            border: "1px solid rgba(111, 100, 235, 0.45)",
-                                            boxShadow: "inset 0 0 14px rgba(111, 100, 235, 0.25)",
                                             transition: "all 0.3s ease",
                                         }}
                                     >
