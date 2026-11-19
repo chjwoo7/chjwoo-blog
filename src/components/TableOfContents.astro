@@ -14,7 +14,7 @@ const { title, sections } = Astro.props
 ---
 
 <nav aria-label="Table of contents">
-  <toc-title aria-hidden="true"><span>{title}</span></toc-title>
+    <toc-title class="!font-bold" aria-hidden="true"><span>{title}</span></toc-title>
   <label data-bar>
     <input type="checkbox" aria-label="Toggle table of contents">
     <svg viewBox="0 0 16 16" aria-hidden="true">
