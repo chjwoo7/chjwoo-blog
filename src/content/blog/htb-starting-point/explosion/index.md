@@ -5,6 +5,7 @@ description: 'This is my personal notes for HTB Explosion Machine'
 image: '/public/static/htb-cover.jpg'
 tags: ["RDP", "Misconfiguration", "Weak Credentials"]
 authors: ['chjwoo']
+order: 4
 ---
 
 After starting the machine my IP is `10.129.1.13`

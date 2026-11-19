@@ -4,6 +4,7 @@ date: 2025-02-04
 description: 'This is my personal notes for HTB Redeemer Machine'
 image: '/public/static/htb-cover.jpg'
 authors: ['chjwoo']
+order: 5
 tags: ["Redis", "Misconfiguration", "Anonymous Access"]
 ---
 

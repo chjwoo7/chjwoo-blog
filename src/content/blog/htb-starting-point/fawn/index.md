@@ -5,6 +5,7 @@ description: 'This is my personal notes for HTB Fawn Machine'
 image: '/public/static/htb-cover.jpg'
 tags: ["FTP", "Misconfiguration"]
 authors: ['chjwoo']
+order: 2
 ---
 
 

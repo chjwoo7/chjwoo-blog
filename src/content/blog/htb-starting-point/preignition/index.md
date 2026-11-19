@@ -5,6 +5,7 @@ description: ''
 image: '/public/static/htb-cover.jpg'
 tags: ["Web Exploitation","Reconnaissance"]
 authors: ['chjwoo']
+order: 8
 ---
 
 Before diving into the exploitation process, we first need to gather intelligence on our target. In this walkthrough, we will explore a machine from HackTheBox's Starting Point series, named Preignition. Our objective is to enumerate the target, uncover potential vulnerabilities, and ultimately gain access to retrieve the flag.

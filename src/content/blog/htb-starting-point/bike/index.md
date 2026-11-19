@@ -5,6 +5,7 @@ date: 2025-02-11
 tags: ["NodeJS","Remote Code Execution","Server Side Template Injection (SSTI)"]
 image: '/public/static/htb-cover.jpg'
 authors: ['chjwoo']
+order: 14
 ---
 
 In this walkthrough, we will explore the HackTheBox Starting Point machine named "Bike". The primary focus will be on exploiting a NodeJS web application that is vulnerable to Server Side Template Injection (SSTI) to achieve Remote Code Execution (RCE). We will cover the steps of reconnaissance, identifying the SSTI vulnerability, exploiting it to gain RCE, and finally retrieving the flag.

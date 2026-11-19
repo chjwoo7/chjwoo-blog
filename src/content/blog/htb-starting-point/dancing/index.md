@@ -5,6 +5,7 @@ description: 'This is my personal notes for HTB Dancing Machine'
 image: '/public/static/htb-cover.jpg'
 tags: ["SMB", "Misconfiguration", "Anonymous Access"]
 authors: ['chjwoo']
+order: 3
 ---
 
 

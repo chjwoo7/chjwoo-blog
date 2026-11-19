@@ -5,6 +5,7 @@ description: ''
 image: '/public/static/htb-cover.jpg'
 tags: ["Database","Misconfiguration","Reconnaissance","MongoDB"]
 authors: ['chjwoo']
+order: 7
 ---
 
 In this blog post, we will walk through the process of enumerating and exploiting an unsecured MongoDB instance to retrieve sensitive data. This process involves reconnaissance using Nmap, gaining a foothold through MongoDB shell access, and extracting valuable information.

@@ -5,6 +5,7 @@ description: 'Writeup Hackfest0x05 CTF Final'
 image: ''
 tags: ["Digital Forensics", "Writeup"]
 authors: ['chjwoo']
+order: 2
 ---
 
 Hello! Kembali lagi bersama saya di post ke 2 ini. Kali ini saya akan membagikan writeup final round Hackfest0x05. Enjoy!<br/><br/>

@@ -5,6 +5,7 @@ description: ''
 image: '/public/static/htb-cover.jpg'
 tags: ["Magento","Weak Credentials","Web Exploitation"]
 authors: ['chjwoo']
+order: 15
 ---
 
 Ignition merupakan mesin Tier 1 dari seri starting point pada platform HackTheBox. Selama pengerjaan saya menggunakan dua tools untuk menyelesaikan tantangan ini. Tools yang saya gunakan diantaranya `nmap` dan `hydra`

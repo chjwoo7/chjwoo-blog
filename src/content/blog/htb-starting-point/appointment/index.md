@@ -5,6 +5,7 @@ date: 2025-02-06
 tags: ["SQL Injection","Reconnaissance","Web Exploitation"]
 image: '/public/static/htb-cover.jpg'
 authors: ['chjwoo']
+order: 6
 ---
 
 In this blog post, we will walk through the process of enumerating and exploiting a misconfigured web application running on an Apache server. Our goal is to gain unauthorized access using SQL Injection and retrieve a hidden flag. This guide covers reconnaissance, discovering a login page, performing SQL Injection, and finally, extracting the flag.

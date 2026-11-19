@@ -5,6 +5,7 @@ description: 'Writeup Hackfest0x05 CTF Qualification'
 image: ''
 tags: ["Cryptography", "Digital Forensics", "Reverse Engineering", "Binary Exploitation", "Writeup"]
 authors: ['chjwoo']
+order: 1
 ---
 
 Hello! Ini merupakan writeup saya sekaligus tulisan pertama saya di blog ini. 😳

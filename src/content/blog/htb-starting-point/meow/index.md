@@ -5,6 +5,7 @@ description: 'This is my personal notes for HTB Meow Machine. Since this is just
 image: '/public/static/htb-cover.jpg'
 tags: ["Weak Credentials", "Misconfiguration"]
 authors: ['chjwoo']
+order: 1
 ---
 
 Since this is just a starting point, I will provide a quick and short walkthrough for my notes.

@@ -5,6 +5,7 @@ date: 2025-02-08
 tags: ["Web Exploitation","Anonymous Access","FTP"]
 image: '/public/static/htb-cover.jpg'
 authors: ['chjwoo']
+order: 10
 ---
 
 In this walkthrough, we exploit a misconfigured vsFTPd 3.0.3 service and weak credentials to gain initial access and retrieve sensitive information, including a flag.

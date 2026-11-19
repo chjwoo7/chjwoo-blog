@@ -7,7 +7,7 @@ import { getPosts } from "@/lib/content"
 const posts = await getPosts()
 ---
 
-<Layout>
+<Layout wide>
   <MetaPage slot="head" title="Blog" />
   <ul>
     {posts.map((post) => <BlogCard post={post} />)}

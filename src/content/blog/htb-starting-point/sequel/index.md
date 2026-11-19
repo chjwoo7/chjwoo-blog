@@ -4,6 +4,7 @@ date: 2025-02-08
 description: ''
 image: '/public/static/htb-cover.jpg'
 authors: ['chjwoo']
+order: 12
 tags: ["MySQL","Database","Weak Credentials"]
 ---
 

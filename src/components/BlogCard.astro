@@ -16,7 +16,11 @@ const authors = await getEntries(post.data.authors)
       </a>
     )}
   <entry-info>
-    <a href={`/blog/${post.id}`}>{post.data.title}</a>
+    <a
+      href={`/blog/${post.id}`}
+      class="font-bold line-clamp-2 text-step-1 leading-[calc(var(--leading-offset)+1em)]"
+      >{post.data.title}</a
+    >
     <entry-meta>
       {authors.length > 0 && (
           <entry-authors>
@@ -40,13 +44,13 @@ const authors = await getEntries(post.data.authors)
       <time datetime={post.data.date.toISOString()}
         >{formatDate(post.data.date)}</time
       >
-      {post.data.tags && (
+      <!-- {post.data.tags && (
           <entry-tags>
             {post.data.tags.map((tag) => (
               <span>#{tag}</span>
             ))}
           </entry-tags>
-        )}
+        )} -->
     </entry-meta>
     <p>{post.data.description}</p>
   </entry-info>
@@ -55,28 +59,25 @@ const authors = await getEntries(post.data.authors)
 <style>
   li {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: var(--space-s);
 
     > a {
       flex-shrink: 0;
-      inline-size: 14rem;
+      inline-size: 18rem;
+      min-block-size: 8rem;
 
       :global(img) {
         inline-size: 100%;
-        block-size: auto;
+        block-size: 100%;
+        object-fit: cover;
       }
     }
 
     entry-info {
       display: flex;
       flex-direction: column;
-
-      > a {
-        font-size: var(--step-1);
-        line-height: calc(var(--leading-offset) + 1em);
-        font-weight: var(--font-weight-medium);
-      }
+      min-inline-size: 0;
 
       entry-meta {
         display: flex;
@@ -132,6 +133,11 @@ const authors = await getEntries(post.data.authors)
       }
 
       p {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        overflow: hidden;
         color: var(--muted-foreground);
       }
     }
@@ -142,6 +148,12 @@ const authors = await getEntries(post.data.authors)
       > a {
         inline-size: 100%;
         max-inline-size: 32rem;
+        min-block-size: 0;
+
+        :global(img) {
+          block-size: auto;
+          aspect-ratio: 1200 / 630;
+        }
       }
     }
   }

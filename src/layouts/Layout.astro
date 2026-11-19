@@ -21,9 +21,9 @@ import MetaHead from "@/components/MetaHead.astro"
 import Sidebar from "@/components/Sidebar.astro"
 import { SITE } from "@/consts"
 
-type Props = { crumbs?: { label: string; href: string }[] }
+type Props = { crumbs?: { label: string; href: string }[]; wide?: boolean }
 
-const { crumbs } = Astro.props
+const { crumbs, wide } = Astro.props
 ---
 
 <html lang={SITE.locale} dir={SITE.dir}>
@@ -31,7 +31,7 @@ const { crumbs } = Astro.props
     <slot name="head" />
   </MetaHead>
   <body>
-    <page-grid>
+    <page-grid data-wide={wide || undefined}>
       <page-header>
         <page-nav>
           <Sidebar crumbs={crumbs}
@@ -101,14 +101,20 @@ const { crumbs } = Astro.props
   page-toc {
     display: block;
     min-width: 0;
-    grid-column: 10 / 13;
+    grid-column: 11 / 13;
     grid-row: 1;
 
     @media screen and (width >= 64rem) {
       position: fixed;
       inset-block: var(--page-offset-top) var(--page-offset-bottom);
       inset-inline-end: var(--grid-edge);
-      width: calc(3 * var(--grid-column-width) + 2 * var(--grid-gutter));
+      width: calc(2 * var(--grid-column-width) + var(--grid-gutter));
+    }
+  }
+
+  @media screen and (width >= 64rem) {
+    page-grid:has(page-toc) page-content {
+      grid-column: 3 / 11;
     }
   }
 
@@ -119,6 +125,14 @@ const { crumbs } = Astro.props
     grid-row: 1;
     min-width: 0;
     margin-block-start: -0.1em;
+
+    page-grid[data-wide] & {
+      grid-column: 1 / -1;
+      justify-self: center;
+      inline-size: calc(
+        8 * var(--grid-column-width) + 7 * var(--grid-gutter)
+      );
+    }
 
     main {
       flex: 1;
