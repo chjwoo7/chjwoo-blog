@@ -9,7 +9,7 @@ const authors = (await getCollection("authors")).sort((a, b) =>
 )
 ---
 
-<Layout>
+<Layout wide>
   <MetaPage slot="head" title="Authors" />
   <ul>
     {authors.map((author) => <AuthorCard author={author} />)}

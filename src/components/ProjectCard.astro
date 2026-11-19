@@ -22,7 +22,7 @@ const { name, description, link, tags, image, startDate, endDate } =
       </a>
     )}
   <entry-info>
-    <a href={`/projects/${project.id}`}>{name}</a>
+    <a class="!font-bold" href={`/projects/${project.id}`}>{name}</a>
     <entry-meta>
       {startDate && (
           <project-dates>
@@ -40,20 +40,25 @@ const { name, description, link, tags, image, startDate, endDate } =
           </project-dates>
         )}
       <project-link>
-        <a href={link} target="_blank" rel="noopener noreferrer">
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1"
+        >
           <ExternalIcon aria-hidden="true" />
           {new URL(link).hostname}
         </a>
       </project-link>
     </entry-meta>
     <p>{description}</p>
-    {tags && tags.length > 0 && (
+    <!-- {tags && tags.length > 0 && (
         <project-tags>
           {tags.map((tag) => (
             <span>{tag}</span>
           ))}
         </project-tags>
-      )}
+      )} -->
   </entry-info>
 </li>
 

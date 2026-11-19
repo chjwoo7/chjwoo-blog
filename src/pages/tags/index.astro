@@ -6,7 +6,7 @@ import { getTags } from "@/lib/content"
 const tags = await getTags()
 ---
 
-<Layout crumbs={[{ label: "Tags", href: "/tags" }]}>
+<Layout wide crumbs={[{ label: "Tags", href: "/tags" }]}>
   <MetaPage slot="head" title="Tags" noindex />
   <ul>
     {[...tags].map(([tag, posts]) => (

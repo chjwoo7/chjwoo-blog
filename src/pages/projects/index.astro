@@ -10,7 +10,7 @@ const projects = (await getCollection("projects")).sort(
 )
 ---
 
-<Layout>
+<Layout wide>
   <MetaPage slot="head" title="Projects" />
   <ul>
     {projects.map((project) => <ProjectCard project={project} />)}

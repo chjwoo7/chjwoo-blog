@@ -20,39 +20,44 @@ const { name, description, link, tags, image, startDate, endDate } = project.dat
 ---
 
 <Layout
-  crumbs={[
-    { label: "Projects", href: "/projects" },
-    { label: name, href: `/projects/${project.id}` },
-  ]}
+  wide
+  crumbs={[{ label: name, href: `/projects/${project.id}` }]}
 >
   <MetaPage slot="head" title={name} description={description} />
 
   <article class="project-detail">
-    <header class="project-header">
-      {image && (
-          <div class="project-banner">
-            <Image src={image} alt={name} width={1000} height={500} />
-          </div>
-        )}
+    {image && (
+      <div class="project-cover">
+        <Image src={image} alt="" width={1600} height={900} priority />
+      </div>
+    )}
 
+    <header class="project-header">
       <h1>{name}</h1>
+      <p class="project-desc">{description}</p>
 
       <div class="project-meta">
         {startDate && (
-            <div class="project-dates">
-              <time datetime={startDate.toISOString()}>
-                {formatDate(startDate)}
+          <div class="project-dates">
+            <time datetime={startDate.toISOString()}>
+              {formatDate(startDate)}
+            </time>
+            <span aria-hidden="true">→</span>
+            {endDate ? (
+              <time datetime={endDate.toISOString()}>
+                {formatDate(endDate)}
               </time>
-              {" → "}
-              {endDate ? (
-                <time datetime={endDate.toISOString()}>
-                  {formatDate(endDate)}
-                </time>
-              ) : (
-                "Present"
-              )}
-            </div>
-          )}
+            ) : (
+              <span>Present</span>
+            )}
+          </div>
+        )}
+
+        {tags && tags.length > 0 && (
+          <div class="project-tags">
+            {tags.map((tag) => <span class="tag">{tag}</span>)}
+          </div>
+        )}
 
         <a
           href={link}
@@ -60,26 +65,14 @@ const { name, description, link, tags, image, startDate, endDate } = project.dat
           rel="noopener noreferrer"
           class="external-btn"
         >
-          <span>Visit Project</span>
+          <span>Visit project</span>
           <ExternalIcon aria-hidden="true" />
         </a>
       </div>
-
-      <p class="project-desc">{description}</p>
-
-      {tags && tags.length > 0 && (
-          <div class="project-tags">
-            {tags.map((tag) => (
-              <span class="tag">{tag}</span>
-            ))}
-          </div>
-        )}
     </header>
 
-    <hr />
-
-    <section class="prose-content">
-      <Content />
+    <section class="project-body">
+      <prose-content><Content /></prose-content>
     </section>
   </article>
 </Layout>
@@ -88,71 +81,63 @@ const { name, description, link, tags, image, startDate, endDate } = project.dat
   .project-detail {
     display: flex;
     flex-direction: column;
-    gap: var(--space-m);
+    gap: var(--space-l);
+  }
+
+  .project-cover {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: var(--muted);
+  }
+
+  .project-cover img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 16 / 8;
+    object-fit: cover;
   }
 
   .project-header {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    max-inline-size: 44rem;
 
     h1 {
       font-size: var(--step-3);
-      line-height: calc(var(--leading-offset) + 1.1em);
-      font-weight: var(--font-weight-medium);
+      line-height: calc(var(--leading-offset) + 0.9em);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      text-wrap: balance;
       color: var(--foreground);
     }
   }
 
-  .project-banner img {
-    width: 100%;
-    height: auto;
-    max-height: 24rem;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+  .project-desc {
+    margin-block-start: var(--space-2xs);
+    font-size: var(--step-1);
+    line-height: calc(var(--leading-offset) + 1.1em);
+    color: var(--prose-foreground);
+    text-wrap: pretty;
   }
 
   .project-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2xs);
+    gap: var(--space-xs) var(--space-s);
+    margin-block-start: var(--space-s);
+    padding-block-start: var(--space-s);
+    border-block-start: 1px solid var(--border);
+    font-size: var(--step--1);
+    color: var(--muted-foreground);
   }
 
   .project-dates {
-    font-size: var(--step--1);
-    color: var(--muted-foreground);
-  }
-
-  .external-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.75rem;
-    font-size: var(--step--1);
-    font-weight: var(--font-weight-medium);
-    background-color: var(--foreground);
-    color: var(--background);
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 0.85;
-    }
-
-    svg {
-      width: 0.85em;
-      height: 0.85em;
-    }
-  }
-
-  .project-desc {
-    font-size: var(--step-0);
-    color: var(--muted-foreground);
-    line-height: calc(var(--leading-offset) + 1.3em);
+    gap: var(--space-3xs);
   }
 
   .project-tags {
@@ -161,18 +146,64 @@ const { name, description, link, tags, image, startDate, endDate } = project.dat
     gap: var(--space-3xs);
 
     .tag {
-      font-size: var(--step--1);
-      padding: 0.15rem 0.5rem;
-      background-color: var(--muted);
+      padding: 0.15rem 0.55rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-full);
+      background: color-mix(in oklab, var(--muted) 60%, transparent);
       color: var(--muted-foreground);
     }
   }
 
-  hr {
-    border: none;
+  .external-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-inline-start: auto;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    background: var(--foreground);
+    color: var(--background);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      opacity: 0.88;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    svg {
+      inline-size: 0.85em;
+      block-size: 0.85em;
+    }
+  }
+
+  .project-body {
+    padding-block-start: var(--space-m);
     border-block-start: 1px solid var(--border);
-    margin: 0;
+  }
+
+  .project-body :global(img) {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+    margin-inline: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  .project-body :global(p > img:only-child) {
+    max-inline-size: min(100%, 22rem);
+  }
+
+  @media (width < 48rem) {
+    .external-btn {
+      margin-inline-start: 0;
+    }
   }
 </style>
