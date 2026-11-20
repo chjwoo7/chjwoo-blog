@@ -18,8 +18,13 @@ export const NAVIGATION = [
   { href: "/about", label: "About" },
 ]
 
-export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
+type Link = { href: string; label: string; icon: SvgComponent }
+
+export const SOCIALS: Link[] = [
   { href: "https://github.com/chjwoo7", label: "GitHub", icon: GitHub },
   { href: "https://x.com/chjwoo7", label: "Twitter", icon: Twitter },
+]
+
+export const FEEDS: Link[] = [
   { href: "/rss.xml", label: "RSS", icon: RSS },
 ]

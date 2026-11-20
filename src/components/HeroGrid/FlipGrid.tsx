@@ -103,6 +103,8 @@ export default function FlipGrid() {
     setIsTransitioning(true)
     setGlobalFlip(false)
 
+    window.dispatchEvent(new Event("flipgrid:enter"))
+
     setTimeout(() => setIsFinished(true), 1200)
   }
 

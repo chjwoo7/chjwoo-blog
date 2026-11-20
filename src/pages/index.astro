@@ -1,6 +1,7 @@
 ---
 import ArrowRight from "@/assets/icons/arrow-right.svg"
 import FlipGrid from "@/components/HeroGrid/FlipGrid"
+import HeroBackdrop from "@/components/GradientASCII/HeroBackdrop"
 import MetaPage from "@/components/MetaPage.astro"
 import SocialIcons from "@/components/SocialIcons.astro"
 import Layout from "@/layouts/Layout.astro"
@@ -22,6 +23,7 @@ const featured = projects[0]
 <Layout>
   <MetaPage slot="head" />
 
+
   <FlipGrid client:only="react" />
   <div
     id="initial-curtain"
@@ -31,14 +33,16 @@ const featured = projects[0]
   </div>
 
   <div class="home">
-    <section class="hero" aria-labelledby="hero-title">
+    <section class="hero p-4! " aria-labelledby="hero-title">
+      <div class="hero-art" aria-hidden="true">
+        <HeroBackdrop client:only="react" />
+      </div>
       <div class="hero-main">
-        <p class="eyebrow" data-reveal><span class="dot"></span>Offensive security · CTF</p>
+        <!-- <p class="eyebrow" data-reveal><span class="dot"></span>Offensive security · CTF</p> -->
         <h1 id="hero-title" data-reveal>Hi, I'm <span class="accent">chjwoo</span>.</h1>
-        <p class="lede" data-reveal>
+        <p class="font-light mt-2!" data-reveal>
           Student from Indonesia exploring offensive security, penetration
-          testing, and CTF. I break systems on purpose, then write down exactly
-          how.
+          testing, and CTF.
         </p>
         <div class="hero-actions" data-reveal>
           <a class="btn primary" href="/blog">Read the blog <ArrowRight /></a>
@@ -59,9 +63,9 @@ const featured = projects[0]
             <div class="profile-id">
               <p class="profile-name">
                 {author.data.name}
-                {author.data.pronouns && (
+                <!-- {author.data.pronouns && (
                   <span class="pronouns">{author.data.pronouns}</span>
-                )}
+                )} -->
               </p>
               <p class="profile-bio">{author.data.bio}</p>
             </div>
@@ -85,7 +89,7 @@ const featured = projects[0]
                 <span class="idx" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span class="post-title">{post.data.title}</span>
+                <span class="post-title line-clamp-1!">{post.data.title}</span>
                 <time datetime={post.data.date.toISOString()}>
                   {formatDate(post.data.date)}
                 </time>
@@ -147,19 +151,46 @@ const featured = projects[0]
   }
 
   .hero {
+    position: relative;
+    isolation: isolate;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 17rem;
     align-items: start;
     gap: var(--space-l);
     padding-block-end: var(--space-l);
-    border-block-end: 1px solid var(--border);
 
     @media (width < 64rem) {
       grid-template-columns: 1fr;
     }
   }
 
+  .hero-art {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    pointer-events: none;
+    mask-image: radial-gradient(
+      120% 100% at 18% 0%,
+      black 15%,
+      transparent 70%
+    );
+  }
+
+  :root[data-theme="light"] .hero-art {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) .hero-art {
+      display: none;
+    }
+  }
+
   .hero-main {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -271,6 +302,8 @@ const featured = projects[0]
   }
 
   .profile-card {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: var(--space-s);

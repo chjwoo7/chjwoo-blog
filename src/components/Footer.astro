@@ -1,6 +1,6 @@
 ---
 import SocialIcons from "@/components/SocialIcons.astro"
-import { SITE, SOCIALS } from "@/consts"
+import { FEEDS, SITE, SOCIALS } from "@/consts"
 ---
 
 <footer>
@@ -8,7 +8,7 @@ import { SITE, SOCIALS } from "@/consts"
     &copy; {new Date().getFullYear()}
     {SITE.title}
   </p>
-  <SocialIcons links={SOCIALS} />
+  <SocialIcons links={[...SOCIALS, ...FEEDS]} />
 </footer>
 
 <style>
