@@ -1,0 +1,8 @@
+html.motion [data-reveal],
+html.motion [data-reveal-scale],
+html.motion [data-reveal-content],
+html.motion [data-reveal-scroll],
+html.motion [data-reveal-group] > *,
+html.motion [data-reveal-list] > * {
+  opacity: 0;
+}

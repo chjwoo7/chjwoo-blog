@@ -63,7 +63,9 @@ const { floating } = Astro.props
   update()
 
   document.addEventListener("click", (event) => {
-    if ((event.target as Element).closest("[data-scroll-top]"))
-      window.scrollTo({ top: 0 })
+    if (!(event.target as Element).closest("[data-scroll-top]")) return
+
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })
   })
 </script>

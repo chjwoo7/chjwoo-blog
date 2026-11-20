@@ -18,27 +18,27 @@ const projects = (await getCollection("projects")).sort(
 const featured = projects[0]
 ---
 
-<Layout wide>
+<Layout>
   <MetaPage slot="head" />
 
   <div class="home">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-main">
-        <p class="eyebrow"><span class="dot"></span>Offensive security · CTF</p>
-        <h1 id="hero-title">Hi, I'm <span class="accent">chjwoo</span>.</h1>
-        <p class="lede">
+        <p class="eyebrow" data-reveal><span class="dot"></span>Offensive security · CTF</p>
+        <h1 id="hero-title" data-reveal>Hi, I'm <span class="accent">chjwoo</span>.</h1>
+        <p class="lede" data-reveal>
           Student from Indonesia exploring offensive security, penetration
           testing, and CTF. I break systems on purpose, then write down exactly
           how.
         </p>
-        <div class="hero-actions">
+        <div class="hero-actions" data-reveal>
           <a class="btn primary" href="/blog">Read the blog <ArrowRight /></a>
           <a class="btn ghost" href="/about">About me</a>
         </div>
       </div>
 
       {author && (
-        <aside class="profile-card">
+        <aside class="profile-card" data-reveal>
           <div class="profile-head">
             <img
               class="avatar"
@@ -63,13 +63,13 @@ const featured = projects[0]
     </section>
 
     <section class="section" aria-labelledby="writing-title">
-      <header class="section-head">
+      <header class="section-head" data-reveal-scroll>
         <h2 id="writing-title">Latest writing</h2>
         <a class="section-link" href="/blog">All posts <ArrowRight /></a>
       </header>
 
       {posts.length > 0 ? (
-        <ol class="post-index">
+        <ol class="post-index" data-reveal-group>
           {posts.map((post, i) => (
             <li>
               <a href={`/blog/${post.id}`}>
@@ -91,13 +91,13 @@ const featured = projects[0]
     </section>
 
     <section class="section" aria-labelledby="projects-title">
-      <header class="section-head">
+      <header class="section-head" data-reveal-scroll>
         <h2 id="projects-title">Projects</h2>
         <a class="section-link" href="/projects">All projects <ArrowRight /></a>
       </header>
 
       {featured ? (
-        <a class="featured" href={`/projects/${featured.id}`}>
+        <a class="featured" href={`/projects/${featured.id}`} data-reveal-scroll>
           {featured.data.image && (
             <div class="featured-media">
               <Image
@@ -105,6 +105,7 @@ const featured = projects[0]
                 alt=""
                 width={960}
                 height={540}
+                data-parallax
               />
             </div>
           )}
@@ -171,6 +172,17 @@ const featured = projects[0]
     border-radius: var(--radius-full);
     background: var(--accent);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent);
+    animation: pulse 3.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 0 7px color-mix(in oklab, var(--accent) 8%, transparent);
+    }
   }
 
   h1 {
@@ -436,6 +448,11 @@ const featured = projects[0]
     }
   }
 
+  .featured-media {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
   .featured-media img {
     display: block;
     inline-size: 100%;
@@ -500,5 +517,11 @@ const featured = projects[0]
   .empty {
     font-size: var(--step--1);
     color: var(--muted-foreground);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot {
+      animation: none;
+    }
   }
 </style>

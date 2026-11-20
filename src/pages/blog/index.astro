@@ -7,9 +7,9 @@ import { getPosts } from "@/lib/content"
 const posts = await getPosts()
 ---
 
-<Layout wide>
+<Layout>
   <MetaPage slot="head" title="Blog" />
-  <ul>
+  <ul data-reveal-group>
     {posts.map((post) => <BlogCard post={post} />)}
   </ul>
 </Layout>

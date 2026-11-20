@@ -24,7 +24,7 @@ const { title, sections } = Astro.props
     <toc-current>{title}</toc-current>
     <ChevronIcon aria-hidden="true" />
   </label>
-  <ul data-bar>
+  <ul data-bar data-reveal-list>
     {sections.map(({ id, label, open, headings }) =>
         id ? (
           <li data-group>
@@ -200,6 +200,7 @@ const { title, sections } = Astro.props
 
     a {
       color: var(--muted-foreground);
+      transition: color 0.18s ease;
 
       &:hover,
       &[data-active] {

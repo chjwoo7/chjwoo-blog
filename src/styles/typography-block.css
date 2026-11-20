@@ -11,7 +11,7 @@ prose-content {
 
   hr {
     margin-block: var(--space-l);
-    border-block-start: 1.5px solid var(--border);
+    border-block-start: 1.5px solid var(--hr-color, var(--divider));
   }
 
   :is(img, video) {

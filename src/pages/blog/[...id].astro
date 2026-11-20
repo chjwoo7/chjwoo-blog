@@ -81,7 +81,7 @@ if (isSubpost(post.id)) {
         <header>
             {entry.data.image &&
               (i === 0 || entry.data.image !== parent.data.image) && (
-              <post-banner>
+              <post-banner data-reveal-scale={i === 0 || undefined}>
                 <Image
                   src={entry.data.image}
                   alt={entry.data.title}
@@ -91,9 +91,11 @@ if (isSubpost(post.id)) {
                 />
               </post-banner>
             )}
-          <h1 class="!font-bold">{entry.data.title}</h1>
+          <h1 class="!font-bold" data-reveal={i === 0 || undefined}>
+            {entry.data.title}
+          </h1>
           {i === 0 && (
-            <post-meta>
+            <post-meta data-reveal>
               {authors.length > 0 && (
                 <post-authors>
                   <author-avatars>
@@ -126,13 +128,13 @@ if (isSubpost(post.id)) {
             </post-meta>
           )}
           {entry.data.description.trim() !== "" && (
-            <p>{entry.data.description}</p>
+            <p data-reveal={i === 0 || undefined}>{entry.data.description}</p>
           )}
         </header>
-          <hr class="text-gray-900"/>
+          <hr data-reveal-content={i === 0 || undefined} />
           <br/>
 
-        <prose-content>
+        <prose-content data-reveal-content={i === 0 || undefined}>
           <Content />
         </prose-content>
       </article>
@@ -236,5 +238,10 @@ if (isSubpost(post.id)) {
       inline-size: 100%;
       block-size: auto;
     }
+  }
+  hr {
+    margin-block: var(--space-m);
+    border: none;
+    border-block-start: 1px solid var(--hr-color, var(--divider));
   }
 </style>

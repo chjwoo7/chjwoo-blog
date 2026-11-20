@@ -4,12 +4,12 @@ import Layout from "@/layouts/Layout.astro"
 import ExternalIcon from "@/assets/icons/external.svg"
 ---
 
-<Layout wide crumbs={[{ label: "About", href: "/about" }]}>
+<Layout crumbs={[{ label: "About", href: "/about" }]}>
   <MetaPage slot="head" title="About" description="About chjwoo - Offensive Security & CTF Player" />
 
   <article class="about-page">
     <!-- Hero Section -->
-    <header class="about-hero">
+    <header class="about-hero" data-reveal-group>
       <div class="hero-avatar">
         <img
           src="https://media1.tenor.com/m/juxuFY7b89UAAAAd/jiwoo-hearts2hearts.gif"
@@ -34,10 +34,10 @@ import ExternalIcon from "@/assets/icons/external.svg"
       </div>
     </header>
 
-    <hr />
+    <hr data-reveal-content />
 
     <!-- About Me Section -->
-    <section class="about-section">
+    <section class="about-section" data-reveal-scroll>
       <h3>About Me</h3>
       <div class="card prose-block">
         <p>
@@ -55,9 +55,9 @@ import ExternalIcon from "@/assets/icons/external.svg"
     </section>
 
     <!-- CTF Teams & Communities -->
-    <section class="about-section">
+    <section class="about-section" data-reveal-scroll>
       <h3>CTF Teams & Communities</h3>
-      <div class="cards-grid">
+      <div class="cards-grid" data-reveal-group>
         <div class="community-card card">
           <div class="community-header">
             <img
@@ -118,9 +118,9 @@ import ExternalIcon from "@/assets/icons/external.svg"
     </section>
 
     <!-- Skills & Interests -->
-    <section class="about-section">
+    <section class="about-section" data-reveal-scroll>
       <h3>Skills & Interests</h3>
-      <div class="skills-grid">
+      <div class="skills-grid" data-reveal-group>
         <div class="card skill-card">
           <h4>🛡️ Offensive Security</h4>
           <ul>
@@ -384,7 +384,7 @@ import ExternalIcon from "@/assets/icons/external.svg"
 
   hr {
     border: none;
-    border-block-start: 1px solid var(--border);
+    border-block-start: 1px solid var(--hr-color, var(--divider));
     margin: 0;
   }
 </style>

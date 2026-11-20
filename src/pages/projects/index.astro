@@ -10,9 +10,9 @@ const projects = (await getCollection("projects")).sort(
 )
 ---
 
-<Layout wide>
+<Layout>
   <MetaPage slot="head" title="Projects" />
-  <ul>
+  <ul data-reveal-group>
     {projects.map((project) => <ProjectCard project={project} />)}
   </ul>
 </Layout>

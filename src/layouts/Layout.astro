@@ -1,5 +1,6 @@
 ---
 import "@/styles/tailwind.css"
+import "@/styles/motion.css"
 import "@/styles/reset.css"
 import "@/styles/fonts.css"
 import "@/styles/color.css"
@@ -21,9 +22,9 @@ import MetaHead from "@/components/MetaHead.astro"
 import Sidebar from "@/components/Sidebar.astro"
 import { SITE } from "@/consts"
 
-type Props = { crumbs?: { label: string; href: string }[]; wide?: boolean }
+type Props = { crumbs?: { label: string; href: string }[] }
 
-const { crumbs, wide } = Astro.props
+const { crumbs } = Astro.props
 ---
 
 <html lang={SITE.locale} dir={SITE.dir}>
@@ -31,7 +32,16 @@ const { crumbs, wide } = Astro.props
     <slot name="head" />
   </MetaHead>
   <body>
-    <page-grid data-wide={wide || undefined}>
+    <script is:inline>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion")
+        setTimeout(() => {
+          if (!window.__motionReady)
+            document.documentElement.classList.remove("motion")
+        }, 2500)
+      }
+    </script>
+    <page-grid>
       <page-header>
         <page-nav>
           <Sidebar crumbs={crumbs}
@@ -47,6 +57,11 @@ const { crumbs, wide } = Astro.props
         <page-footer><Footer /></page-footer>
       </page-content>
     </page-grid>
+    <script>
+      import { initMotion } from "@/lib/motion"
+
+      initMotion()
+    </script>
   </body>
 </html>
 
@@ -112,28 +127,16 @@ const { crumbs, wide } = Astro.props
     }
   }
 
-  @media screen and (width >= 64rem) {
-    page-grid:has(page-toc) page-content {
-      grid-column: 3 / 11;
-    }
-  }
-
   page-content {
     display: flex;
     flex-direction: column;
-    grid-column: 3 / 10;
+    grid-column: 3 / 11;
     grid-row: 1;
     min-width: 0;
     margin-block-start: -0.1em;
 
     @media screen and (width >= 64rem) {
-      page-grid[data-wide] & {
-        grid-column: 1 / -1;
-        justify-self: center;
-        inline-size: calc(
-          8 * var(--grid-column-width) + 7 * var(--grid-gutter)
-        );
-      }
+      padding-inline: var(--grid-gutter);
     }
 
     main {

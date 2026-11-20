@@ -48,6 +48,11 @@
 
 html {
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
 
   @media (width < 64rem) {
     --bar-nav-height: calc(2rem + 2 * var(--space-2xs) + 2px);
