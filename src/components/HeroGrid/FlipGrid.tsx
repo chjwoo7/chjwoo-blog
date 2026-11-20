@@ -1,0 +1,344 @@
+import { useEffect, useMemo, useState, type MouseEvent } from "react"
+import { createPortal } from "react-dom"
+import FlipCard from "./FlipCard"
+
+const CARDS = Array.from({ length: 36 }, (_, i) => ({ id: i }))
+
+export default function FlipGrid() {
+  const [mounted, setMounted] = useState(
+    () => typeof window !== "undefined",
+  )
+  const [globalFlip, setGlobalFlip] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isFinished, setIsFinished] = useState(false)
+  const [useFlipDelay, setUseFlipDelay] = useState(false)
+  const [resetTrigger, setResetTrigger] = useState(0)
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  )
+  const [dimensions, setDimensions] = useState(() => ({
+    width: typeof window !== "undefined" ? window.innerWidth : 1280,
+    height: typeof window !== "undefined" ? window.innerHeight : 800,
+  }))
+
+  const randomDelays = useMemo(
+    () => CARDS.map(() => Math.random() * 300),
+    [],
+  )
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      })
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  useEffect(() => {
+    const curtain = document.getElementById("initial-curtain")
+    if (!curtain) return
+
+    const hide = setTimeout(() => {
+      curtain.style.transition = "opacity 0.5s ease"
+      curtain.style.opacity = "0"
+      setTimeout(() => curtain.remove(), 500)
+    }, 100)
+
+    return () => clearTimeout(hide)
+  }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [])
+
+  const cols = isMobile ? 4 : 6
+  const rows = isMobile ? 9 : 6
+
+  const minD = Math.min(dimensions.width, dimensions.height || 1)
+  const bgWidth = minD * 0.65
+  const bgHeight = minD * 0.65
+
+  const xOffset = (bgWidth - dimensions.width) / 2
+  const yOffset = (bgHeight - dimensions.height) / 2
+
+  const cellWidth = dimensions.width / cols
+  const cellHeight = dimensions.height / rows
+
+  const toggleGlobalFlip = () => {
+    if (isTransitioning) return
+    setUseFlipDelay(true)
+    setResetTrigger((prev) => prev + 1)
+    setGlobalFlip(!globalFlip)
+    setTimeout(() => setUseFlipDelay(false), 800)
+  }
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && globalFlip && !isTransitioning) {
+        toggleGlobalFlip()
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  })
+
+
+  const handleEnterSite = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    document.body.style.overflow = ""
+
+    setUseFlipDelay(true)
+    setResetTrigger((prev) => prev + 1)
+    setIsTransitioning(true)
+    setGlobalFlip(false)
+
+    setTimeout(() => setIsFinished(true), 1200)
+  }
+
+  if (!mounted || isFinished) return null
+
+  return createPortal(
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 99999,
+        overflow: "hidden",
+        backgroundColor: "transparent",
+        pointerEvents: isTransitioning ? "none" : "auto",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "#0D1326",
+          display: isTransitioning ? "none" : "block",
+          zIndex: 1,
+        }}
+      />
+
+      <div
+        style={{
+          display: "grid",
+          height: "100%",
+          width: "100%",
+          gap: "4px",
+          padding: "4px",
+          position: "relative",
+          zIndex: 10,
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gridTemplateRows: `repeat(${rows}, 1fr)`,
+          pointerEvents: isTransitioning ? "none" : "auto",
+        }}
+      >
+        {CARDS.map((card, index) => {
+          const col = index % cols
+          const row = Math.floor(index / cols)
+
+          const bgPosX = -(col * cellWidth) - xOffset
+          const bgPosY = -(row * cellHeight) - yOffset
+          const bgPosYBack = -(row * cellHeight)
+
+          return (
+            <div
+              key={card.id}
+              style={{
+                width: "100%",
+                height: "100%",
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: isMobile ? "4px" : "10px",
+              }}
+            >
+              <FlipCard
+                id={card.id}
+                globalFlip={globalFlip}
+                randomDelay={randomDelays[index] ?? 0}
+                revealMode={false}
+                useDelay={useFlipDelay}
+                resetTrigger={resetTrigger}
+                onGlobalClick={toggleGlobalFlip}
+                front={
+                  isTransitioning ? (
+                    <div
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: isMobile ? "4px" : "10px",
+                        backgroundColor: "transparent",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: isMobile ? "4px" : "10px",
+                        backgroundImage: "url('/static/hero-mask2.png')",
+                        backgroundSize: `${bgWidth}px ${bgHeight}px`,
+                        backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                        backgroundRepeat: "no-repeat",
+                        backgroundColor: "#171C33",
+                        transition: "all 0.3s ease",
+                      }}
+                    />
+                  )
+                }
+                back={
+                  <div
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      borderRadius: isMobile ? "4px" : "10px",
+                      backgroundImage: "url('/static/hero-flipped-mask.svg')",
+                      backgroundSize: `${bgWidth}px ${bgHeight}px`,
+                      backgroundPosition: `${bgPosX}px ${bgPosYBack}px`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundColor: "#6f64eb",
+                      transition: "all 0.3s ease",
+                    }}
+                  />
+                }
+              />
+            </div>
+          )
+        })}
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 25,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          opacity: globalFlip && !isTransitioning ? 1 : 0,
+          transition: isTransitioning ? "none" : "opacity 0.3s ease",
+        }}
+      >
+        <div
+          onClick={(event) => event.stopPropagation()}
+          style={{
+            pointerEvents: globalFlip && !isTransitioning ? "auto" : "none",
+            backgroundColor: "#171C33",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            border: "1.5px solid rgba(111, 100, 235, 0.4)",
+            borderRadius: "1.25rem",
+            padding: isMobile ? "1.5rem" : "2.25rem 2.5rem",
+            textAlign: "center",
+            boxShadow:
+              "0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(111, 100, 235, 0.3)",
+            width: "90%",
+            maxWidth: "420px",
+            transform:
+              globalFlip && !isTransitioning ? "scale(1)" : "scale(0.95)",
+            transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            color: "#ffffff",
+            fontFamily: "var(--font-sans, system-ui, sans-serif)",
+          }}
+        >
+          <div style={{ marginBottom: "1rem" }}>
+            <img
+              src="https://media1.tenor.com/m/juxuFY7b89UAAAAd/jiwoo-hearts2hearts.gif"
+              alt="chjwoo profile"
+              style={{
+                width: isMobile ? "80px" : "96px",
+                height: isMobile ? "80px" : "96px",
+                borderRadius: "9999px",
+                border: "2.5px solid #6f64eb",
+                margin: "0 auto",
+                boxShadow: "0 0 20px rgba(111, 100, 235, 0.6)",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </div>
+
+          <h1
+            style={{
+              fontSize: isMobile ? "1.75rem" : "2.25rem",
+              fontWeight: 700,
+              color: "#ffffff",
+              marginBottom: "0.4rem",
+              letterSpacing: "0.02em",
+              lineHeight: 1.2,
+            }}
+          >
+            chjwoo
+          </h1>
+
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: isMobile ? "0.875rem" : "1rem",
+              fontWeight: 500,
+              marginBottom: "0.25rem",
+              lineHeight: 1.4,
+            }}
+          >
+            Offensive Security & CTF Player
+          </p>
+
+          <p
+            style={{
+              color: "#c4b5fd",
+              fontSize: isMobile ? "0.875rem" : "1rem",
+              fontWeight: 500,
+              marginBottom: "1.5rem",
+              lineHeight: 1.4,
+            }}
+          >
+            Founder of Nusahack
+          </p>
+
+          <button
+            type="button"
+            onClick={handleEnterSite}
+            style={{
+              display: "inline-block",
+              padding: isMobile ? "0.7rem 1.75rem" : "0.75rem 2.25rem",
+              borderRadius: "9999px",
+              backgroundColor: "#6f64eb",
+              color: "#ffffff",
+              fontWeight: 700,
+              fontSize: isMobile ? "0.95rem" : "1.05rem",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 0 25px rgba(111, 100, 235, 0.6)",
+              transition: "all 0.2s ease",
+              outline: "none",
+            }}
+            onMouseEnter={(event) => {
+              event.currentTarget.style.transform = "scale(1.05)"
+              event.currentTarget.style.boxShadow =
+                "0 0 35px rgba(111, 100, 235, 0.9)"
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.transform = "scale(1)"
+              event.currentTarget.style.boxShadow =
+                "0 0 25px rgba(111, 100, 235, 0.6)"
+            }}
+          >
+            Enter Site
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}

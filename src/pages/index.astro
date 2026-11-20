@@ -1,5 +1,6 @@
 ---
 import ArrowRight from "@/assets/icons/arrow-right.svg"
+import FlipGrid from "@/components/HeroGrid/FlipGrid"
 import MetaPage from "@/components/MetaPage.astro"
 import SocialIcons from "@/components/SocialIcons.astro"
 import Layout from "@/layouts/Layout.astro"
@@ -20,6 +21,14 @@ const featured = projects[0]
 
 <Layout>
   <MetaPage slot="head" />
+
+  <FlipGrid client:only="react" />
+  <div
+    id="initial-curtain"
+    aria-hidden="true"
+    style="position: fixed; inset: 0; z-index: 99998; background-color: #0d1326;"
+  >
+  </div>
 
   <div class="home">
     <section class="hero" aria-labelledby="hero-title">
